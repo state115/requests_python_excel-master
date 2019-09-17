@@ -1,0 +1,736 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>测试报告</title>
+    <meta name="generator" content="HTMLTestRunner 0.8.3"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    
+<style type="text/css" media="screen">
+body        { font-family: verdana, arial, helvetica, sans-serif; font-size: 80%; }
+table       { font-size: 100%; }
+pre         { }
+
+/* -- heading ---------------------------------------------------------------------- */
+h1 {
+	font-size: 16pt;
+	color: gray;
+}
+.heading {
+    margin-top: 0ex;
+    margin-bottom: 1ex;
+}
+
+.heading .attribute {
+    margin-top: 1ex;
+    margin-bottom: 0;
+}
+
+.heading .description {
+    margin-top: 4ex;
+    margin-bottom: 6ex;
+}
+
+/* -- css div popup ------------------------------------------------------------------------ */
+a.popup_link {
+}
+
+a.popup_link:hover {
+    color: red;
+}
+.img{
+	width: 100%;
+	height: 100%;
+	border-collapse: collapse;
+    border: 2px solid #777;
+}
+
+.screenshots {
+    z-index: 100;
+	position:absolute;
+	left: 23%;
+	top: 20%;
+	display: none;
+}
+.close_shots {
+	position:absolute;
+	top:0; left:98%;
+	z-index:99;
+	width:20px;
+}
+.popup_window {
+    display: none;
+    position: relative;
+    left: 0px;
+    top: 0px;
+    /*border: solid #627173 1px; */
+    padding: 10px;
+    background-color: #E6E6D6;
+    font-family: "Lucida Console", "Courier New", Courier, monospace;
+    text-align: left;
+    font-size: 8pt;
+    width: 500px;
+}
+
+}
+/* -- report ------------------------------------------------------------------------ */
+#show_detail_line {
+    margin-top: 3ex;
+    margin-bottom: 1ex;
+}
+#result_table {
+    width: 80%;
+    border-collapse: collapse;
+    border: 1px solid #777;
+}
+#header_row {
+    font-weight: bold;
+    color: white;
+    background-color: #777;
+}
+#result_table td {
+    border: 1px solid #777;
+    padding: 2px;
+}
+#total_row  { font-weight: bold; }
+.passClass  { background-color: #6c6; }
+.failClass  { background-color: #c60; }
+.errorClass { background-color: #c00; }
+.passCase   { color: #6c6; }
+.failCase   { color: #c60; font-weight: bold; }
+.errorCase  { color: #c00; font-weight: bold; }
+.hiddenRow  { display: none; }
+.testcase   { margin-left: 2em; }
+
+
+/* -- ending ---------------------------------------------------------------------- */
+#ending {
+}
+
+
+.piechart{
+    position:absolute;  ;
+    top:20px;
+    left:300px;
+    width: 200px;
+    float: left;
+    display:  inline;
+}
+
+
+</style>
+
+</head>
+<body>
+<script language="javascript" type="text/javascript">
+output_list = Array();
+
+/* level - 0:Summary; 1:Failed; 2:All */
+function showCase(level) {
+    trs = document.getElementsByTagName("tr");
+    for (var i = 0; i < trs.length; i++) {
+        tr = trs[i];
+        id = tr.id;
+        if (id.substr(0,2) == 'ft') {
+            if (level < 1) {
+                tr.className = 'hiddenRow';
+            }
+            else {
+                tr.className = '';
+            }
+        }
+        if (id.substr(0,2) == 'pt') {
+            if (level > 1) {
+                tr.className = '';
+            }
+            else {
+                tr.className = 'hiddenRow';
+            }
+        }
+    }
+}
+
+
+function showClassDetail(cid, count) {
+    var id_list = Array(count);
+    var toHide = 1;
+    for (var i = 0; i < count; i++) {
+        tid0 = 't' + cid.substr(1) + '.' + (i+1);
+        tid = 'f' + tid0;
+        tr = document.getElementById(tid);
+        if (!tr) {
+            tid = 'p' + tid0;
+            tr = document.getElementById(tid);
+        }
+        id_list[i] = tid;
+        if (tr.className) {
+            toHide = 0;
+        }
+    }
+    for (var i = 0; i < count; i++) {
+        tid = id_list[i];
+        if (toHide) {
+            document.getElementById('div_'+tid).style.display = 'none'
+            document.getElementById(tid).className = 'hiddenRow';
+        }
+        else {
+            document.getElementById(tid).className = '';
+        }
+    }
+}
+
+
+function showTestDetail(div_id){
+    var details_div = document.getElementById(div_id)
+    var displayState = details_div.style.display
+    // alert(displayState)
+    if (displayState != 'block' ) {
+        displayState = 'block'
+        details_div.style.display = 'block'
+    }
+    else {
+        details_div.style.display = 'none'
+    }
+}
+
+
+function html_escape(s) {
+    s = s.replace(/&/g,'&amp;');
+    s = s.replace(/</g,'&lt;');
+    s = s.replace(/>/g,'&gt;');
+    return s;
+}
+
+function drawCircle(pass, fail, error){
+    var color = ["#6c6","#c60","#c00"];
+    var data = [pass,fail,error];
+    var text_arr = ["pass", "fail", "error"];
+
+    var canvas = document.getElementById("circle");
+    var ctx = canvas.getContext("2d");
+    var startPoint=0;
+    var width = 20, height = 10;
+    var posX = 112 * 2 + 20, posY = 30;
+    var textX = posX + width + 5, textY = posY + 10;
+    for(var i=0;i<data.length;i++){
+        ctx.fillStyle = color[i];
+        ctx.beginPath();
+        ctx.moveTo(112,84);
+        ctx.arc(112,84,84,startPoint,startPoint+Math.PI*2*(data[i]/(data[0]+data[1]+data[2])),false);
+        ctx.fill();
+        startPoint += Math.PI*2*(data[i]/(data[0]+data[1]+data[2]));
+        ctx.fillStyle = color[i];
+        ctx.fillRect(posX, posY + 20 * i, width, height);
+        ctx.moveTo(posX, posY + 20 * i);
+        ctx.font = 'bold 14px';
+        ctx.fillStyle = color[i];
+        var percent = text_arr[i] + ":"+data[i];
+        ctx.fillText(percent, textX, textY + 20 * i);
+
+    }
+}
+
+function show_shots(obj) {
+	obj.nextElementSibling.style.display="block";
+
+}
+
+function close_shots(obj) {
+	obj.parentElement.style.display="none";
+}
+
+</script>
+<div class="piechart">
+    <div>
+        <canvas id="circle" width="350" height="168" </canvas>
+    </div>
+</div>
+<div class='heading'>
+<h1>测试报告</h1>
+<p class='attribute'><strong>开始时间:</strong> 2019-09-06 11:17:24</p>
+<p class='attribute'><strong>耗时:</strong> 0:00:18.369525</p>
+<p class='attribute'><strong>状态:</strong> <span class="tj passCase">Pass</span>11 <span class="tj failCase">Failure</span>1</p>
+
+<p class='description'>用例执行情况</p>
+</div>
+
+
+
+<p id='show_detail_line'>显示
+<a href='javascript:showCase(0)'>概要</a>
+<a href='javascript:showCase(1)'>失败</a>
+<a href='javascript:showCase(2)'>所有</a>
+</p>
+
+<table id='result_table'>
+<colgroup>
+<col align='left' />
+<col align='right' />
+<col align='right' />
+<col align='right' />
+<col align='right' />
+<col align='right' />
+<col align='right' />
+</colgroup>
+<tr id='header_row'>
+    <td>测试组/测试用例</td>
+    <td>总数</td>
+    <td>通过</td>
+    <td>失败</td>
+    <td>错误</td>
+    <td>视图</td>
+    <td>错误截图</td>
+</tr>
+
+<tr class='failClass'>
+    <td>test_api.Test_api</td>
+    <td>12</td>
+    <td>11</td>
+    <td>1</td>
+    <td>0</td>
+    <td><a href="javascript:showClassDetail('c1',12)">详情</a></td>
+    <td>&nbsp;</td>
+</tr>
+
+<tr id='ft1.1' class='none'>
+    <td ><div class='testcase'>test_api_01</div></td>
+    <td colspan='5' align='center'>
+
+    <!--css div popup start-->
+    <span class='status failCase'>
+    <a class="popup_link" onfocus='this.blur();' href="javascript:showTestDetail('div_ft1.1')" >
+        失败</a></span>
+
+    <div id='div_ft1.1' class="popup_window">
+        <div style='text-align: right; color:red;cursor:pointer'>
+        <a onfocus='this.blur();' onclick="document.getElementById('div_ft1.1').style.display = 'none' " >
+           [x]</a>
+        </div>
+        <pre>
+        
+ft1.1: *******正在执行用例：-----  t_001  ----**********
+请求方式：get, 请求url:http://japi.juhe.cn/qqevaluate/qq
+请求params：{'key': '正确的', 'qq': '283340479'}
+页面返回信息：
+{"resultcode":"101","reason":"KEY ERROR!","result":[],"error_code":10001}
+检查点-&gt;："reason":"successed!"
+返回实际结果-&gt;：
+{"resultcode":"101","reason":"KEY ERROR!","result":[],"error_code":10001}
+Traceback (most recent call last):
+  File "E:\ATP\venv\lib\site-packages\ddt.py", line 145, in wrapper
+    return func(self, *args, **kwargs)
+  File "D:\requests_python_excel-master\requests_python_excel-master\case\test_api.py", line 40, in test_api
+    self.assertTrue(check in res_text)
+AssertionError: False is not true
+
+
+        </pre>
+    </div>
+    <!--css div popup end-->
+
+    </td>
+    <td></td>
+</tr>
+
+<tr id='pt1.2' class='hiddenRow'>
+    <td ><div class='testcase'>test_api_02</div></td>
+    <td colspan='5' align='center'>
+
+    <!--css div popup start-->
+    <span class='status passCase'>
+    <a class="popup_link" onfocus='this.blur();' href="javascript:showTestDetail('div_pt1.2')" >
+        通过</a></span>
+
+    <div id='div_pt1.2' class="popup_window">
+        <div style='text-align: right; color:red;cursor:pointer'>
+        <a onfocus='this.blur();' onclick="document.getElementById('div_pt1.2').style.display = 'none' " >
+           [x]</a>
+        </div>
+        <pre>
+        
+pt1.2: *******正在执行用例：-----  t_002  ----**********
+请求方式：get, 请求url:http://japi.juhe.cn/qqevaluate/qq
+请求params：{'key': '错误的', 'qq': '283340479'}
+页面返回信息：
+{"resultcode":"101","reason":"KEY ERROR!","result":[],"error_code":10001}
+用例测试结果:   t_002----&gt;pass
+检查点-&gt;："reason":"KEY ERROR!"
+返回实际结果-&gt;：
+{"resultcode":"101","reason":"KEY ERROR!","result":[],"error_code":10001}
+
+
+        </pre>
+    </div>
+    <!--css div popup end-->
+
+    </td>
+    <td></td>
+</tr>
+
+<tr id='pt1.3' class='hiddenRow'>
+    <td ><div class='testcase'>test_api_03</div></td>
+    <td colspan='5' align='center'>
+
+    <!--css div popup start-->
+    <span class='status passCase'>
+    <a class="popup_link" onfocus='this.blur();' href="javascript:showTestDetail('div_pt1.3')" >
+        通过</a></span>
+
+    <div id='div_pt1.3' class="popup_window">
+        <div style='text-align: right; color:red;cursor:pointer'>
+        <a onfocus='this.blur();' onclick="document.getElementById('div_pt1.3').style.display = 'none' " >
+           [x]</a>
+        </div>
+        <pre>
+        
+pt1.3: *******正在执行用例：-----  t_003  ----**********
+请求方式：get, 请求url:http://v.juhe.cn/weather/index
+请求params：{'cityname': '上海', 'format': '1', 'dtype': 'json', 'key': 'xxx'}
+页面返回信息：{"resultcode":"101","reason":"错误的请求KEY","result":null,"error_code":10001}
+用例测试结果:   t_003----&gt;pass
+检查点-&gt;："reason":"错误的请求KEY"
+返回实际结果-&gt;：{"resultcode":"101","reason":"错误的请求KEY","result":null,"error_code":10001}
+
+
+        </pre>
+    </div>
+    <!--css div popup end-->
+
+    </td>
+    <td></td>
+</tr>
+
+<tr id='pt1.4' class='hiddenRow'>
+    <td ><div class='testcase'>test_api_04</div></td>
+    <td colspan='5' align='center'>
+
+    <!--css div popup start-->
+    <span class='status passCase'>
+    <a class="popup_link" onfocus='this.blur();' href="javascript:showTestDetail('div_pt1.4')" >
+        通过</a></span>
+
+    <div id='div_pt1.4' class="popup_window">
+        <div style='text-align: right; color:red;cursor:pointer'>
+        <a onfocus='this.blur();' onclick="document.getElementById('div_pt1.4').style.display = 'none' " >
+           [x]</a>
+        </div>
+        <pre>
+        
+pt1.4: 请求头部：{'Content-Type': 'application/x-www-form-urlencoded'}
+*******正在执行用例：-----  t_006  ----**********
+请求方式：post, 请求url:http://apiprd.zhuishubao.com/appprogram/articles/V2/article-list
+请求params：None
+post请求body类型为：data ,body内容为：{'version': '2', 'type': '2', 'page': '1', 'pageSize': '20', 'token': '27456c0cd432731a400d53dd9e1ad490', 'device_id': '860604044727590'}
+页面返回信息：{"status":true,"data":{"list":[{"aid":516,"nid":11132,"sort":1,"title":"【赵权和孙晓芸】他入赘孙家三年,忍气吞声，如今老婆劈腿，亮出身份，前妻求复合...","layout_type":1,"read_number":3105184,"source":"九连环","bookname":"顶级高手","chapter_id":8025272,"img_list":["https://img.wannengzhuishu.com/uploads/article/20190814/62d13551efa5.png?x-oss-process=image/resize,m_mfit,h_340,w_700/format,webp"]},{"aid":840,"nid":8413,"sort":1,"title":"【林隐和张琪沫】装穷被甩，无奈只好回家继承家业，没想是前女友是……","layout_type":1,"read_number":215138,"source":"阿豪","bookname":"天降豪婿","chapter_id":7313209,"img_list":["https://img.wannengzhuishu.com/uploads/article/20190827/a3f6730b86de.png?x-oss-process=image/resize,m_mfit,h_340,w_700/format,webp"]},{"aid":847,"nid":11190,"sort":1,"title":"【今日头条】农民工被老婆嫌弃，众人嘲讽，怒揭真实身份惊呆众人！","layout_type":2,"read_number":171596,"source":"火车","bookname":"都市之最强女婿","chapter_id":8064064,"img_list":["https://img.wannengzhuishu.com/uploads/article/20190827/4bfbe39bfad0.png?x-oss-process=image/resize,m_mfit,h_340,w_700/format,webp"]},{"aid":1239,"nid":8381,"sort":1,"title":"【趣头条】他是村里人公认的废物，在一次偷看村花洗澡中竟然获得男人梦寐以求的能力","layout_type":1,"read_number":52962,"source":"惜墨","bookname":"透视小医仙","chapter_id":7300682,"img_list":["https://img.wannengzhuishu.com/uploads/article/20190902/2db5a6ac4aeb.png?x-oss-process=image/resize,m_mfit,h_340,w_700/format,webp"]},{"aid":410,"nid":6564,"sort":100,"title":"她自小寄人篱下，找回真实身份后却陷入更大的圈套...","layout_type":1,"read_number":759,"source":"娟雪","bookname":"刚好遇见你","chapter_id":5281180,"img_list":["https://img.wannengzhuishu.com/uploads/article/20190731/a65bf26550aa.png?x-oss-process=image/resize,m_mfit,h_340,w_700/format,webp"]},{"aid":550,"nid":5470,"sort":100,"title":"爱人害她家破人亡，带着腹中孩子含恨血祭，上天竟让她重生了","layout_type":3,"read_number":1435,"source":"初心未改","bookname":"毒后戏邪皇","chapter_id":4851929,"img_list":["https://img.wannengzhuishu.com/uploads/article/20190816/e36d44a37d76.jpg?x-oss-process=image/resize,m_mfit,h_340,w_700/format,webp","https://img.wannengzhuishu.com/uploads/article/20190816/35d05fcf7922.jpg?x-oss-process=image/resize,m_mfit,h_340,w_700/format,webp","https://img.wannengzhuishu.com/uploads/article/20190816/12ff37033223.jpg?x-oss-process=image/resize,m_mfit,h_340,w_700/format,webp"]},{"aid":1000,"nid":10993,"sort":100,"title":"村里每晚都有漂亮妹子来敲门，但这个门，不能开","layout_type":2,"read_number":2158,"source":"川贝子","bookname":"捡个女鬼当老婆","chapter_id":7989092,"img_list":["https://img.wannengzhuishu.com/uploads/article/20190829/bef1b74afd04.png?x-oss-process=image/resize,m_mfit,h_340,w_700/format,webp"]},{"aid":470,"nid":9013,"sort":100,"title":"魂穿古代一心致富，却被世子欺身而上：娘子，我们成亲吧？","layout_type":3,"read_number":537,"source":"LCZM","bookname":"农门医女","chapter_id":7471141,"img_list":["https://img.wannengzhuishu.com/uploads/article/20190808/fc56889a4347.png?x-oss-process=image/resize,m_mfit,h_340,w_700/format,webp","https://img.wannengzhuishu.com/uploads/article/20190808/d5c64b80d4bd.png?x-oss-process=image/resize,m_mfit,h_340,w_700/format,webp","https://img.wannengzhuishu.com/uploads/article/20190808/173800d0dbd6.png?x-oss-process=image/resize,m_mfit,h_340,w_700/format,webp"]},{"aid":270,"nid":8362,"sort":100,"title":"这家人杀蛇吃蛇，后来生了个儿子，背上长蛇胎从小古怪...","layout_type":1,"read_number":3208,"source":"辰逸","bookname":"茅山鬼咒","chapter_id":7289155,"img_list":["https://img.wannengzhuishu.com/uploads/article/20190615/4c9ec86c8db0.jpg?x-oss-process=image/resize,m_mfit,h_340,w_700/format,webp"]},{"aid":390,"nid":7661,"sort":100,"title":"恐怖版《陈情令》，道士“阴虎符”让纸人复生跟真人一样","layout_type":1,"read_number":1242,"source":"烟斗","bookname":"乡野道师","chapter_id":7011563,"img_list":["https://img.wannengzhuishu.com/uploads/article/20190806/7515c90a96a0.png?x-oss-process=image/resize,m_mfit,h_340,w_700/format,webp"]},{"aid":450,"nid":155,"sort":100,"title":"被扶持的渣男惨害而死，重活一次，欠我的都要讨回来！","layout_type":3,"read_number":1809,"source":"莜小灵","bookname":"医世盛欢：嫡妃不好惹","chapter_id":75923,"img_list":["https://img.wannengzhuishu.com/uploads/article/20190805/da92d3e87142.png?x-oss-process=image/resize,m_mfit,h_340,w_700/format,webp","https://img.wannengzhuishu.com/uploads/article/20190805/8ea2323d96d4.jpg?x-oss-process=image/resize,m_mfit,h_340,w_700/format,webp","https://img.wannengzhuishu.com/uploads/article/20190805/e50d9e8d537d.png?x-oss-process=image/resize,m_mfit,h_340,w_700/format,webp"]},{"aid":137304735745,"nid":-1000,"sort":4,"title":"附近的小姐姐都喜欢看的小说","layout_type":2,"read_number":9046,"source":"雨过天晴","bookname":"","chapter_id":0,"img_list":["https://img.wannengzhuishu.com/uploads/article/20190802/53d05a4f70eb.png?x-oss-process=image/resize,m_mfit,h_340,w_700/format,webp"]},{"aid":130,"nid":2209,"sort":100,"title":"老公养了个小三，没想到竟是婆婆带回来的…","layout_type":2,"read_number":10171,"source":"清水可倚","bookname":"多余的女人","chapter_id":2810634,"img_list":["https://img.wannengzhuishu.com/uploads/article/20190724/b72a49284938.jpg?x-oss-process=image/resize,m_mfit,h_340,w_700/format,webp"]},{"aid":310,"nid":107,"sort":100,"title":"六年前，她为救他，成了他的女人，他却在隔天清晨匆匆而去。","layout_type":2,"read_number":3352,"source":"顾伊雪","bookname":"豪门宝妈","chapter_id":52768,"img_list":["https://img.wannengzhuishu.com/uploads/article/20190706/a77c4c452349.jpg?x-oss-process=image/resize,m_mfit,h_340,w_700/format,webp"]},{"aid":640,"nid":8366,"sort":100,"title":"那一天，堂哥骗我去挖同学媳妇的坟","layout_type":1,"read_number":1121,"source":"葱花","bookname":"死亡媒介","chapter_id":7290138,"img_list":["https://img.wannengzhuishu.com/uploads/article/20190823/1a79d147ce17.png?x-oss-process=image/resize,m_mfit,h_340,w_700/format,webp"]},{"aid":600,"nid":8408,"sort":100,"title":"我天生一双阴阳眼，刚入职警队就出事了","layout_type":1,"read_number":2136,"source":"公子既白","bookname":"诡案","chapter_id":7311204,"img_list":["https://img.wannengzhuishu.com/uploads/article/20190821/6ea5021651ca.png?x-oss-process=image/resize,m_mfit,h_340,w_700/format,webp"]},{"aid":480,"nid":7931,"sort":100,"title":"陆少走错房间还和人睡了？助理战战兢兢收到短信：三天内查清那女人","layout_type":2,"read_number":4835,"source":"青青小草","bookname":"错爱之我的总裁大人","chapter_id":7156853,"img_list":["https://img.wannengzhuishu.com/uploads/article/20190809/3998a9549d92.png?x-oss-process=image/resize,m_mfit,h_340,w_700/format,webp"]},{"aid":430,"nid":8238,"sort":100,"title":"家里居然穷得连米都吃不起？女主穿越后拖家带口奔小康","layout_type":3,"read_number":617,"source":"花孞花汐","bookname":"农家娇女之食香满园","chapter_id":7257055,"img_list":["https://img.wannengzhuishu.com/uploads/article/20190802/c93df8e3125b.png?x-oss-process=image/resize,m_mfit,h_340,w_700/format,webp","https://img.wannengzhuishu.com/uploads/article/20190802/c60701315987.png?x-oss-process=image/resize,m_mfit,h_340,w_700/format,webp","https://img.wannengzhuishu.com/uploads/article/20190802/0db4e296c78f.png?x-oss-process=image/resize,m_mfit,h_340,w_700/format,webp"]},{"aid":1290,"nid":7282,"sort":100,"title":"宽广的心助你成功，芝麻细小的心让你寸步难行","layout_type":3,"read_number":547,"source":"李世强","bookname":"每天学点宽心的活法","chapter_id":6988451,"img_list":["https://img.wannengzhuishu.com/uploads/article/20190903/322848b30f5f.jpg?x-oss-process=image/resize,m_mfit,h_340,w_700/format,webp","https://img.wannengzhuishu.com/uploads/article/20190903/b646868197a2.jpg?x-oss-process=image/resize,m_mfit,h_340,w_700/format,webp","https://img.wannengzhuishu.com/uploads/article/20190903/a71b66bff153.png?x-oss-process=image/resize,m_mfit,h_340,w_700/format,webp"]},{"aid":280,"nid":2,"sort":100,"title":"她本是不受宠的二女儿，意外代替他心爱的女人成为主角，却不想从此沦为替身","layout_type":3,"read_number":2402,"source":"风沐萧","bookname":"独家总裁","chapter_id":742,"img_list":["https://img.wannengzhuishu.com/uploads/article/20190618/e0562b4b0a3f.png?x-oss-process=image/resize,m_mfit,h_340,w_700/format,webp","https://img.wannengzhuishu.com/uploads/article/20190618/bcbd7e2d128f.png?x-oss-process=image/resize,m_mfit,h_340,w_700/format,webp","https://img.wannengzhuishu.com/uploads/article/20190618/ddda97a38462.png?x-oss-process=image/resize,m_mfit,h_340,w_700/format,webp"]}],"total":187,"total_page":10,"refresh_num":20}}
+用例测试结果:   t_006----&gt;pass
+检查点-&gt;："data":{"list"
+返回实际结果-&gt;：{"status":true,"data":{"list":[{"aid":516,"nid":11132,"sort":1,"title":"【赵权和孙晓芸】他入赘孙家三年,忍气吞声，如今老婆劈腿，亮出身份，前妻求复合...","layout_type":1,"read_number":3105184,"source":"九连环","bookname":"顶级高手","chapter_id":8025272,"img_list":["https://img.wannengzhuishu.com/uploads/article/20190814/62d13551efa5.png?x-oss-process=image/resize,m_mfit,h_340,w_700/format,webp"]},{"aid":840,"nid":8413,"sort":1,"title":"【林隐和张琪沫】装穷被甩，无奈只好回家继承家业，没想是前女友是……","layout_type":1,"read_number":215138,"source":"阿豪","bookname":"天降豪婿","chapter_id":7313209,"img_list":["https://img.wannengzhuishu.com/uploads/article/20190827/a3f6730b86de.png?x-oss-process=image/resize,m_mfit,h_340,w_700/format,webp"]},{"aid":847,"nid":11190,"sort":1,"title":"【今日头条】农民工被老婆嫌弃，众人嘲讽，怒揭真实身份惊呆众人！","layout_type":2,"read_number":171596,"source":"火车","bookname":"都市之最强女婿","chapter_id":8064064,"img_list":["https://img.wannengzhuishu.com/uploads/article/20190827/4bfbe39bfad0.png?x-oss-process=image/resize,m_mfit,h_340,w_700/format,webp"]},{"aid":1239,"nid":8381,"sort":1,"title":"【趣头条】他是村里人公认的废物，在一次偷看村花洗澡中竟然获得男人梦寐以求的能力","layout_type":1,"read_number":52962,"source":"惜墨","bookname":"透视小医仙","chapter_id":7300682,"img_list":["https://img.wannengzhuishu.com/uploads/article/20190902/2db5a6ac4aeb.png?x-oss-process=image/resize,m_mfit,h_340,w_700/format,webp"]},{"aid":410,"nid":6564,"sort":100,"title":"她自小寄人篱下，找回真实身份后却陷入更大的圈套...","layout_type":1,"read_number":759,"source":"娟雪","bookname":"刚好遇见你","chapter_id":5281180,"img_list":["https://img.wannengzhuishu.com/uploads/article/20190731/a65bf26550aa.png?x-oss-process=image/resize,m_mfit,h_340,w_700/format,webp"]},{"aid":550,"nid":5470,"sort":100,"title":"爱人害她家破人亡，带着腹中孩子含恨血祭，上天竟让她重生了","layout_type":3,"read_number":1435,"source":"初心未改","bookname":"毒后戏邪皇","chapter_id":4851929,"img_list":["https://img.wannengzhuishu.com/uploads/article/20190816/e36d44a37d76.jpg?x-oss-process=image/resize,m_mfit,h_340,w_700/format,webp","https://img.wannengzhuishu.com/uploads/article/20190816/35d05fcf7922.jpg?x-oss-process=image/resize,m_mfit,h_340,w_700/format,webp","https://img.wannengzhuishu.com/uploads/article/20190816/12ff37033223.jpg?x-oss-process=image/resize,m_mfit,h_340,w_700/format,webp"]},{"aid":1000,"nid":10993,"sort":100,"title":"村里每晚都有漂亮妹子来敲门，但这个门，不能开","layout_type":2,"read_number":2158,"source":"川贝子","bookname":"捡个女鬼当老婆","chapter_id":7989092,"img_list":["https://img.wannengzhuishu.com/uploads/article/20190829/bef1b74afd04.png?x-oss-process=image/resize,m_mfit,h_340,w_700/format,webp"]},{"aid":470,"nid":9013,"sort":100,"title":"魂穿古代一心致富，却被世子欺身而上：娘子，我们成亲吧？","layout_type":3,"read_number":537,"source":"LCZM","bookname":"农门医女","chapter_id":7471141,"img_list":["https://img.wannengzhuishu.com/uploads/article/20190808/fc56889a4347.png?x-oss-process=image/resize,m_mfit,h_340,w_700/format,webp","https://img.wannengzhuishu.com/uploads/article/20190808/d5c64b80d4bd.png?x-oss-process=image/resize,m_mfit,h_340,w_700/format,webp","https://img.wannengzhuishu.com/uploads/article/20190808/173800d0dbd6.png?x-oss-process=image/resize,m_mfit,h_340,w_700/format,webp"]},{"aid":270,"nid":8362,"sort":100,"title":"这家人杀蛇吃蛇，后来生了个儿子，背上长蛇胎从小古怪...","layout_type":1,"read_number":3208,"source":"辰逸","bookname":"茅山鬼咒","chapter_id":7289155,"img_list":["https://img.wannengzhuishu.com/uploads/article/20190615/4c9ec86c8db0.jpg?x-oss-process=image/resize,m_mfit,h_340,w_700/format,webp"]},{"aid":390,"nid":7661,"sort":100,"title":"恐怖版《陈情令》，道士“阴虎符”让纸人复生跟真人一样","layout_type":1,"read_number":1242,"source":"烟斗","bookname":"乡野道师","chapter_id":7011563,"img_list":["https://img.wannengzhuishu.com/uploads/article/20190806/7515c90a96a0.png?x-oss-process=image/resize,m_mfit,h_340,w_700/format,webp"]},{"aid":450,"nid":155,"sort":100,"title":"被扶持的渣男惨害而死，重活一次，欠我的都要讨回来！","layout_type":3,"read_number":1809,"source":"莜小灵","bookname":"医世盛欢：嫡妃不好惹","chapter_id":75923,"img_list":["https://img.wannengzhuishu.com/uploads/article/20190805/da92d3e87142.png?x-oss-process=image/resize,m_mfit,h_340,w_700/format,webp","https://img.wannengzhuishu.com/uploads/article/20190805/8ea2323d96d4.jpg?x-oss-process=image/resize,m_mfit,h_340,w_700/format,webp","https://img.wannengzhuishu.com/uploads/article/20190805/e50d9e8d537d.png?x-oss-process=image/resize,m_mfit,h_340,w_700/format,webp"]},{"aid":137304735745,"nid":-1000,"sort":4,"title":"附近的小姐姐都喜欢看的小说","layout_type":2,"read_number":9046,"source":"雨过天晴","bookname":"","chapter_id":0,"img_list":["https://img.wannengzhuishu.com/uploads/article/20190802/53d05a4f70eb.png?x-oss-process=image/resize,m_mfit,h_340,w_700/format,webp"]},{"aid":130,"nid":2209,"sort":100,"title":"老公养了个小三，没想到竟是婆婆带回来的…","layout_type":2,"read_number":10171,"source":"清水可倚","bookname":"多余的女人","chapter_id":2810634,"img_list":["https://img.wannengzhuishu.com/uploads/article/20190724/b72a49284938.jpg?x-oss-process=image/resize,m_mfit,h_340,w_700/format,webp"]},{"aid":310,"nid":107,"sort":100,"title":"六年前，她为救他，成了他的女人，他却在隔天清晨匆匆而去。","layout_type":2,"read_number":3352,"source":"顾伊雪","bookname":"豪门宝妈","chapter_id":52768,"img_list":["https://img.wannengzhuishu.com/uploads/article/20190706/a77c4c452349.jpg?x-oss-process=image/resize,m_mfit,h_340,w_700/format,webp"]},{"aid":640,"nid":8366,"sort":100,"title":"那一天，堂哥骗我去挖同学媳妇的坟","layout_type":1,"read_number":1121,"source":"葱花","bookname":"死亡媒介","chapter_id":7290138,"img_list":["https://img.wannengzhuishu.com/uploads/article/20190823/1a79d147ce17.png?x-oss-process=image/resize,m_mfit,h_340,w_700/format,webp"]},{"aid":600,"nid":8408,"sort":100,"title":"我天生一双阴阳眼，刚入职警队就出事了","layout_type":1,"read_number":2136,"source":"公子既白","bookname":"诡案","chapter_id":7311204,"img_list":["https://img.wannengzhuishu.com/uploads/article/20190821/6ea5021651ca.png?x-oss-process=image/resize,m_mfit,h_340,w_700/format,webp"]},{"aid":480,"nid":7931,"sort":100,"title":"陆少走错房间还和人睡了？助理战战兢兢收到短信：三天内查清那女人","layout_type":2,"read_number":4835,"source":"青青小草","bookname":"错爱之我的总裁大人","chapter_id":7156853,"img_list":["https://img.wannengzhuishu.com/uploads/article/20190809/3998a9549d92.png?x-oss-process=image/resize,m_mfit,h_340,w_700/format,webp"]},{"aid":430,"nid":8238,"sort":100,"title":"家里居然穷得连米都吃不起？女主穿越后拖家带口奔小康","layout_type":3,"read_number":617,"source":"花孞花汐","bookname":"农家娇女之食香满园","chapter_id":7257055,"img_list":["https://img.wannengzhuishu.com/uploads/article/20190802/c93df8e3125b.png?x-oss-process=image/resize,m_mfit,h_340,w_700/format,webp","https://img.wannengzhuishu.com/uploads/article/20190802/c60701315987.png?x-oss-process=image/resize,m_mfit,h_340,w_700/format,webp","https://img.wannengzhuishu.com/uploads/article/20190802/0db4e296c78f.png?x-oss-process=image/resize,m_mfit,h_340,w_700/format,webp"]},{"aid":1290,"nid":7282,"sort":100,"title":"宽广的心助你成功，芝麻细小的心让你寸步难行","layout_type":3,"read_number":547,"source":"李世强","bookname":"每天学点宽心的活法","chapter_id":6988451,"img_list":["https://img.wannengzhuishu.com/uploads/article/20190903/322848b30f5f.jpg?x-oss-process=image/resize,m_mfit,h_340,w_700/format,webp","https://img.wannengzhuishu.com/uploads/article/20190903/b646868197a2.jpg?x-oss-process=image/resize,m_mfit,h_340,w_700/format,webp","https://img.wannengzhuishu.com/uploads/article/20190903/a71b66bff153.png?x-oss-process=image/resize,m_mfit,h_340,w_700/format,webp"]},{"aid":280,"nid":2,"sort":100,"title":"她本是不受宠的二女儿，意外代替他心爱的女人成为主角，却不想从此沦为替身","layout_type":3,"read_number":2402,"source":"风沐萧","bookname":"独家总裁","chapter_id":742,"img_list":["https://img.wannengzhuishu.com/uploads/article/20190618/e0562b4b0a3f.png?x-oss-process=image/resize,m_mfit,h_340,w_700/format,webp","https://img.wannengzhuishu.com/uploads/article/20190618/bcbd7e2d128f.png?x-oss-process=image/resize,m_mfit,h_340,w_700/format,webp","https://img.wannengzhuishu.com/uploads/article/20190618/ddda97a38462.png?x-oss-process=image/resize,m_mfit,h_340,w_700/format,webp"]}],"total":187,"total_page":10,"refresh_num":20}}
+
+
+        </pre>
+    </div>
+    <!--css div popup end-->
+
+    </td>
+    <td></td>
+</tr>
+
+<tr id='pt1.5' class='hiddenRow'>
+    <td ><div class='testcase'>test_api_05</div></td>
+    <td colspan='5' align='center'>
+
+    <!--css div popup start-->
+    <span class='status passCase'>
+    <a class="popup_link" onfocus='this.blur();' href="javascript:showTestDetail('div_pt1.5')" >
+        通过</a></span>
+
+    <div id='div_pt1.5' class="popup_window">
+        <div style='text-align: right; color:red;cursor:pointer'>
+        <a onfocus='this.blur();' onclick="document.getElementById('div_pt1.5').style.display = 'none' " >
+           [x]</a>
+        </div>
+        <pre>
+        
+pt1.5: *******正在执行用例：-----  t_005  ----**********
+请求方式：post, 请求url:https://api.apiopen.top/developerUpdateKey
+请求params：None
+post请求body类型为：data ,body内容为：{'name': 'peakchao', 'passwd': '123456'}
+E:\ATP\venv\lib\site-packages\urllib3\connectionpool.py:851: InsecureRequestWarning: Unverified HTTPS request is being made. Adding certificate verification is strongly advised. See: https://urllib3.readthedocs.io/en/latest/advanced-usage.html#ssl-warnings
+  InsecureRequestWarning)
+页面返回信息：{"code":200,"message":"成功!","result":{"apikey":"701059ba1e08cc20dde707b23b14ddd3","email":null}}
+用例测试结果:   t_005----&gt;pass
+检查点-&gt;："message":"成功!"
+返回实际结果-&gt;：{"code":200,"message":"成功!","result":{"apikey":"701059ba1e08cc20dde707b23b14ddd3","email":null}}
+
+
+        </pre>
+    </div>
+    <!--css div popup end-->
+
+    </td>
+    <td></td>
+</tr>
+
+<tr id='pt1.6' class='hiddenRow'>
+    <td ><div class='testcase'>test_api_06</div></td>
+    <td colspan='5' align='center'>
+
+    <!--css div popup start-->
+    <span class='status passCase'>
+    <a class="popup_link" onfocus='this.blur();' href="javascript:showTestDetail('div_pt1.6')" >
+        通过</a></span>
+
+    <div id='div_pt1.6' class="popup_window">
+        <div style='text-align: right; color:red;cursor:pointer'>
+        <a onfocus='this.blur();' onclick="document.getElementById('div_pt1.6').style.display = 'none' " >
+           [x]</a>
+        </div>
+        <pre>
+        
+pt1.6: 请求头部：{'Content-Type': 'application/x-www-form-urlencoded'}
+*******正在执行用例：-----  t_007  ----**********
+请求方式：post, 请求url:http://apiprd.zhuishubao.com/appprogram/fiction/v2/book-screen-recommend
+请求params：None
+post请求body类型为：data ,body内容为：{'version': '2', 'type': 'like', 'pageSize': '20', 'page': '1', 'device_id': '860604044727590', 'cat_id': '18'}
+页面返回信息：{"status":true,"data":{"pages":17,"list":[{"title":"猜你喜欢","books":[{"id":0,"catId":2,"author":"某R","bookname":"王爷，妾身今晚不侍寝","brief":"如有来世，我愿偿还今生所有的债，无所欠，无所负。\r\n如有来世，我愿……再看一眼你含笑的容颜。","cover":"https://wnzsapp.oss-cn-shanghai.aliyuncs.com/uploads/novel/308801437697.jpg?x-oss-process=image/resize,m_mfit,h_256,w_192/format,webp","updateStatus":1,"keyweight":0,"evaScore":0.0,"totalUsers":0,"readingNum":952,"nid":11080,"favoriteNum":0,"avgScore":0.0,"praiseNum":0,"channel":0,"chaptersTotal":0,"cat_name":"古代言情"}]},{"title":"好看到停不下来的热门书籍","books":[{"id":0,"catId":3,"author":"海阔天空","bookname":"慕先生，你晚到的这些年","brief":"她为救母命，躺在妹夫身下，被利用得一干二净。\r\n五年后，她带着萌宝归来，发誓要让害她的人付出代价！","cover":"https://wnzsapp.oss-cn-shanghai.aliyuncs.com/uploads/novel/215956324353.jpg?x-oss-process=image/resize,m_mfit,h_256,w_192/format,webp","updateStatus":1,"keyweight":0,"evaScore":0.0,"totalUsers":0,"readingNum":1355,"nid":7811,"favoriteNum":0,"avgScore":0.0,"praiseNum":0,"channel":0,"chaptersTotal":0,"cat_name":"现代言情"}]},{"title":"穿越种田：自己动手丰衣足食","books":[{"id":0,"catId":22,"author":"紫狼蝶","bookname":"系统农女：猎户强宠小娘子","brief":"    苦逼穿越，成了爹不疼娘不爱的农家女。 为了吃饱穿暖，她撸起袖子加油干，没想到捡了个宝盒，教她造大棚，种鲜蔬。 但是，光享受福利可不行，还要完成任务，帮宝盒升级。 五级是个木宝盒，十五级变为铁宝盒… 任务越变态，福利越诱人。 就这样，她种田耕地，放牧种树，凭着自己的双手改变命运，只是，她难得大发两次善心，怎么就给自己招惹来个麻烦的小毛头。 莫名成了孩儿他娘也就算了，为啥她又莫名和那个有名无实的猎户夫君生米成熟饭？ 我说这位大哥，咱有话好说，宝盒没说过，假戏真做也是我的任务之一啊\r\n\r\n","cover":"https://wnzsapp.oss-cn-shanghai.aliyuncs.com/uploads/novel/161833025537.jpg?x-oss-process=image/resize,m_mfit,h_256,w_192/format,webp","updateStatus":1,"keyweight":0,"evaScore":0.0,"totalUsers":0,"readingNum":448,"nid":7147,"favoriteNum":0,"avgScore":0.0,"praiseNum":0,"channel":0,"chaptersTotal":0,"cat_name":"穿越重生"}]},{"title":"吸血鬼殿下也柔情","books":[{"id":0,"catId":3,"author":"拾月","bookname":"一咬定情：吸血鬼总裁的专宠","brief":"“不要，不要了……”\r\n她脸色苍白，无力的推搡着。\r\n男人抚上她的脖子，眼眸深沉，粗重的喘息在她的耳边，“最后一口，一口就好……”\r\n她在路上随便捡了个美男，却没想到从此不只要卖血还要卖身。\r\n“你说好最后一口的……”\r\n“正常的男人都是吃荤的……”\r\n“唔——”","cover":"https://wnzsapp.oss-cn-shanghai.aliyuncs.com/uploads/novel/13639876609.jpg?x-oss-process=image/resize,m_mfit,h_256,w_192/format,webp","updateStatus":1,"keyweight":0,"evaScore":0.0,"totalUsers":0,"readingNum":1101,"nid":609,"favoriteNum":0,"avgScore":0.0,"praiseNum":0,"channel":0,"chaptersTotal":0,"cat_name":"现代言情"}]},{"title":"爱娱乐圈的姐妹看这里","books":[{"id":0,"catId":22,"author":"天容","bookname":"蜜爱百分百：重生影后太撩人","brief":"她前世为渣男所害，重生后立志报复。纵然是……“贺天擎,我不爱你，我只是在利用你！”贺天擎一脸邪笑盯着冬青道：“利用？我不在乎，现在你用完我了，是不是该我用你了?”“你……你要干嘛！”“你，说呢？”","cover":"https://wnzsapp.oss-cn-shanghai.aliyuncs.com/uploads/novel/162470559745.jpg?x-oss-process=image/resize,m_mfit,h_256,w_192/format,webp","updateStatus":0,"keyweight":0,"evaScore":0.0,"totalUsers":0,"readingNum":1239,"nid":7183,"favoriteNum":0,"avgScore":0.0,"praiseNum":0,"channel":0,"chaptersTotal":0,"cat_name":"穿越重生"}]},{"title":"高贵总裁 在线追妻","books":[{"id":0,"catId":3,"author":"青青子衿","bookname":"甜妻外嫁，总裁要劫婚","brief":"第一次见面，她喝醉酒死死缠着他不放。第二次见面，她被继母陷害昏迷，他替她出了头。第三次见面，他把她堵在墙角：“我救了你，你怎么报答我？”当她如愿嫁给了他之后，占有欲极强的他简直寸步不离，把她霸占的死死的，动不动就要撒狗粮…忍无可忍的她抱着儿子逃到“天涯海角”，千里寻爹的小包子发话：快去把妈咪和我接回来！某女欲哭无泪，现在后悔还来得及吗？","cover":"https://wnzsapp.oss-cn-shanghai.aliyuncs.com/uploads/novel/171463147521.jpg?x-oss-process=image/resize,m_mfit,h_256,w_192/format,webp","updateStatus":1,"keyweight":0,"evaScore":0.0,"totalUsers":0,"readingNum":8188,"nid":7637,"favoriteNum":0,"avgScore":0.0,"praiseNum":0,"channel":0,"chaptersTotal":0,"cat_name":"现代言情"}]},{"title":"小编精选 告别书荒","books":[{"id":0,"catId":22,"author":"北溪浅笑","bookname":"医妃嫁到请接驾","brief":" 丞相府二小姐，众人眼中的废物、丑女。长得丑，她被人唾弃、厌恶，被太子悔婚。皇上用她羞辱凌王，被冤枉是刺客内应遭人鞭打致死。 同名同姓不同灵魂，现在的苏婠央是国家特种训练的药剂师。天下没有她解不开的毒，治不好的病！ 王爷你嫌我丑？没关系，那我蒙着脸。 然，皇上寿宴，那想要羞辱她的人在扯下那从不离身的面纱之后，看到的是天仙亦不可媲美的美人儿。 太子后悔了？恩恩，让他后悔去吧。 王爷心动了？嘿嘿，殿下，您不是说您不是以貌取人的人么？ ","cover":"https://wnzsapp.oss-cn-shanghai.aliyuncs.com/uploads/novel/67494739969.jpg?x-oss-process=image/resize,m_mfit,h_256,w_192/format,webp","updateStatus":1,"keyweight":0,"evaScore":0.0,"totalUsers":0,"readingNum":12651,"nid":2738,"favoriteNum":0,"avgScore":0.0,"praiseNum":0,"channel":0,"chaptersTotal":0,"cat_name":"穿越重生"}]},{"title":"本周内搜索飙升好书","books":[{"id":0,"catId":3,"author":"江晚晚","bookname":"纵情","brief":"这是我做情妇的第二个年头，圈里的姐妹都叫我一姐，羡慕我现在的地位，\r\n却不知那些年，我为了生存的辛酸于悲哀......","cover":"https://wnzsapp.oss-cn-shanghai.aliyuncs.com/uploads/novel/153545080833.jpg?x-oss-process=image/resize,m_mfit,h_256,w_192/format,webp","updateStatus":1,"keyweight":0,"evaScore":0.0,"totalUsers":0,"readingNum":9073,"nid":6778,"favoriteNum":0,"avgScore":0.0,"praiseNum":0,"channel":0,"chaptersTotal":0,"cat_name":"现代言情"}]},{"title":"渣男回头，问你还敢不敢爱","books":[{"id":0,"catId":3,"author":"苏凉","bookname":"先离后爱：豪门下堂妻","brief":"五年的婚姻随着他初恋的回来而结束，他弃她如敝履，她黯然退场。\r\n五年后，她带着幼子回归，却不想，前夫竟一次又一次的纠缠。\r\n","cover":"https://wnzsapp.oss-cn-shanghai.aliyuncs.com/uploads/novel/190186520577.jpg?x-oss-process=image/resize,m_mfit,h_256,w_192/format,webp","updateStatus":1,"keyweight":0,"evaScore":0.0,"totalUsers":0,"readingNum":2701,"nid":8699,"favoriteNum":0,"avgScore":0.0,"praiseNum":0,"channel":0,"chaptersTotal":0,"cat_name":"现代言情"}]},{"title":"豪门甜宠文","books":[{"id":0,"catId":3,"author":"蒗蔚","bookname":"总裁你悠着点","brief":" 因为背叛，她和同学来到酒吧，本就只想借酒浇愁，但却来了一场放纵，遇上了他。 他是神秘的厉少，他说：“把你的一生交给我吧！”他说：“你的痛苦，我来解决。你的快乐，我给。 她是孤零零奋斗在自己人生的一名小设计家，被同学嫉妒她的才华，被家人讨厌她的存在。 然而，就在遇见他之后，当她振臂欢呼想要清除人生道路上的各种障碍时，只剩一阵凉风轻轻地飘了过来，暗示着她，你就随便走一走，前面便是康庄大道。 此刻她心中万马奔腾，总裁啊，你就不能悠着点？这让她还怎么愉快的和他们玩耍。","cover":"https://wnzsapp.oss-cn-shanghai.aliyuncs.com/uploads/novel/155122139137.jpg?x-oss-process=image/resize,m_mfit,h_256,w_192/format,webp","updateStatus":1,"keyweight":0,"evaScore":0.0,"totalUsers":0,"readingNum":1604,"nid":6846,"favoriteNum":0,"avgScore":0.0,"praiseNum":0,"channel":0,"chaptersTotal":0,"cat_name":"现代言情"}]},{"title":"这个冥王很高冷","books":[{"id":0,"catId":2,"author":"默默","bookname":"绝色狂妃：冥王的天才宠妃","brief":"刚穿越就发现自己怀孕，孩子他爹还是已故的战神冥王....","cover":"https://wnzsapp.oss-cn-shanghai.aliyuncs.com/uploads/novel/121819365377.png?x-oss-process=image/resize,m_mfit,h_256,w_192/format,webp","updateStatus":0,"keyweight":0,"evaScore":0.0,"totalUsers":0,"readingNum":1669,"nid":5421,"favoriteNum":0,"avgScore":0.0,"praiseNum":0,"channel":0,"chaptersTotal":0,"cat_name":"古代言情"}]},{"title":"婚后甜宠文 ","books":[{"id":0,"catId":3,"author":"御妖","bookname":"豪门溺宠：陆少的千亿娇妻","brief":"她以为她在复仇路上捡到的是个软柿子，谁知竟然是只小狼狗！这只小狼狗不但有权有势！黑夜里更是大野狼！","cover":"https://wnzsapp.oss-cn-shanghai.aliyuncs.com/uploads/novel/162487336961.jpg?x-oss-process=image/resize,m_mfit,h_256,w_192/format,webp","updateStatus":0,"keyweight":0,"evaScore":0.0,"totalUsers":0,"readingNum":3804,"nid":7184,"favoriteNum":0,"avgScore":0.0,"praiseNum":0,"channel":0,"chaptersTotal":0,"cat_name":"现代言情"}]},{"title":"萌宝驾到 甜宠不断","books":[{"id":0,"catId":3,"author":"任朝暮","bookname":"霸爱烈恋：跟着老婆走","brief":"在庄宇琛眼里，眼前这个女人唯利试图，水性杨花，但却让他难以自拔，一退再退。对于沈安而言，婚姻留给她无边的痛苦，她为了复仇而生，却又沉浸在那个男人霸道温柔的手段之下。","cover":"https://wnzsapp.oss-cn-shanghai.aliyuncs.com/uploads/novel/305580212225.jpg?x-oss-process=image/resize,m_mfit,h_256,w_192/format,webp","updateStatus":0,"keyweight":0,"evaScore":0.0,"totalUsers":0,"readingNum":3006,"nid":11090,"favoriteNum":0,"avgScore":0.0,"praiseNum":0,"channel":0,"chaptersTotal":0,"cat_name":"现代言情"}]},{"title":"总裁霸爱入坑不亏","books":[{"id":0,"catId":3,"author":"谨羽","bookname":"天价萌宝：总裁爹地超给力","brief":"“偷了我的基因想不认帐？”他逮住她，要她交出6年前生的宝宝。她死活不愿交出儿子，他只好纡尊降贵的对她死缠烂打，更是扬言要求同居。“爸爸，妈妈和别的叔叔跑了。”某宝告密。“派人给我追，绑回来家法伺候。”某男大怒。她只是和同事一块儿去出差，哪里是和别的男人跑路。于是，以后的每天某宝看到妈妈总是扶着墙下楼，然后爸爸笑的意犹未尽。","cover":"https://wnzsapp.oss-cn-shanghai.aliyuncs.com/uploads/novel/161916911617.jpg?x-oss-process=image/resize,m_mfit,h_256,w_192/format,webp","updateStatus":0,"keyweight":0,"evaScore":0.0,"totalUsers":0,"readingNum":14216,"nid":7152,"favoriteNum":0,"avgScore":0.0,"praiseNum":0,"channel":0,"chaptersTotal":0,"cat_name":"现代言情"}]},{"title":"准备好纸巾，这本书虐哭了","books":[{"id":0,"catId":2,"author":"月斜影清","bookname":"霸宠腹黑王妃","brief":"一觉醒来，竟然发现自己被绑了，那个男人怎么回事，拿一本《素女心经》问我哪里来的刺客？\r\n咦，这哪里是《素女心经》，明明是春宫图....","cover":"https://wnzsapp.oss-cn-shanghai.aliyuncs.com/uploads/novel/5083496449.jpg?x-oss-process=image/resize,m_mfit,h_256,w_192/format,webp","updateStatus":1,"keyweight":0,"evaScore":0.0,"totalUsers":0,"readingNum":446,"nid":137,"favoriteNum":0,"avgScore":0.0,"praiseNum":0,"channel":0,"chaptersTotal":0,"cat_name":"古代言情"}]},{"title":"总裁溺爱甜到发鼾","books":[{"id":0,"catId":3,"author":"写书的老外","bookname":"独家爆料：惹上网红老婆","brief":"一场再普通不过的新闻爆料，作为坐拥几千万微博粉丝的博主，柰小金不淡定了，不就是报道你堂堂博世总裁婚内出轨了吗？\r\n外加出轨双性恋了吗？双性恋又SM吗？SM又群嗨了吗？群嗨还喜欢野战找刺激吗？\r\n这点小事也劳烦您把我这大V博主绑回来小皮鞭子抽吗？","cover":"https://wnzsapp.oss-cn-shanghai.aliyuncs.com/uploads/novel/14629732353.jpg?x-oss-process=image/resize,m_mfit,h_256,w_192/format,webp","updateStatus":1,"keyweight":0,"evaScore":0.0,"totalUsers":0,"readingNum":220,"nid":663,"favoriteNum":0,"avgScore":0.0,"praiseNum":0,"channel":0,"chaptersTotal":0,"cat_name":"现代言情"}]},{"title":"你想要的温柔总裁都有","books":[{"id":0,"catId":3,"author":"陌凉","bookname":"盛宠101分：晏少撩妻过度","brief":"因为私生女的身份，被男朋友嫌弃了，不仅跟她分手还光明正大的跟她姐好上了。祝晨曦转身撩了个一脸禁欲的男人。但是说好的禁欲系人设呢？人人都说这个男人寡情寡欲，没有兴趣爱好，却只有祝晨曦知道，这个男人人前高冷，人后荡漾，出门衣冠，进门禽畜，这才是最真实的。","cover":"https://wnzsapp.oss-cn-shanghai.aliyuncs.com/uploads/novel/162437005313.jpg?x-oss-process=image/resize,m_mfit,h_256,w_192/format,webp","updateStatus":0,"keyweight":0,"evaScore":0.0,"totalUsers":0,"readingNum":2603,"nid":7181,"favoriteNum":0,"avgScore":0.0,"praiseNum":0,"channel":0,"chaptersTotal":0,"cat_name":"现代言情"}]},{"title":"穿越一线牵 珍惜这段缘","books":[{"id":0,"catId":22,"author":"北溪浅笑","bookname":"医妃嫁到请接驾","brief":" 丞相府二小姐，众人眼中的废物、丑女。长得丑，她被人唾弃、厌恶，被太子悔婚。皇上用她羞辱凌王，被冤枉是刺客内应遭人鞭打致死。 同名同姓不同灵魂，现在的苏婠央是国家特种训练的药剂师。天下没有她解不开的毒，治不好的病！ 王爷你嫌我丑？没关系，那我蒙着脸。 然，皇上寿宴，那想要羞辱她的人在扯下那从不离身的面纱之后，看到的是天仙亦不可媲美的美人儿。 太子后悔了？恩恩，让他后悔去吧。 王爷心动了？嘿嘿，殿下，您不是说您不是以貌取人的人么？ ","cover":"https://wnzsapp.oss-cn-shanghai.aliyuncs.com/uploads/novel/67494739969.jpg?x-oss-process=image/resize,m_mfit,h_256,w_192/format,webp","updateStatus":1,"keyweight":0,"evaScore":0.0,"totalUsers":0,"readingNum":12651,"nid":2738,"favoriteNum":0,"avgScore":0.0,"praiseNum":0,"channel":0,"chaptersTotal":0,"cat_name":"穿越重生"}]},{"title":"穿越逆袭，丑女也有春天","books":[{"id":0,"catId":22,"author":"北溪浅笑","bookname":"本王不是妻奴","brief":"    东秦北子靖手握重兵，是个直男癌晚期患者。 “沈若溪，女人就应该乖乖待在后院，本王受伤了你给本王包扎，本王中毒了你给本王解毒，舞弄权势非女子所为。” 说着便默默把自己两军兵符、王府大权都给了她。王府侍卫们无语擦汗 “沈若溪，女人应该上得厅堂下得厨房，你以后要多在厨艺上下功夫。” 厨房里的大妈望着刚被王爷剥完的虾壳无语凝噎。 “沈若溪，女人就该以男人为尊。男人说一女人不能说二，你既然嫁给了本王，便什么都得听本王的。” 看着面前一本正经跪在搓衣板上的某人，沈若溪：“你说的很有道理，奖励你多跪半个时辰。&amp;","cover":"https://wnzsapp.oss-cn-shanghai.aliyuncs.com/uploads/novel/155055030273.jpg?x-oss-process=image/resize,m_mfit,h_256,w_192/format,webp","updateStatus":1,"keyweight":0,"evaScore":0.0,"totalUsers":0,"readingNum":7086,"nid":6842,"favoriteNum":0,"avgScore":0.0,"praiseNum":0,"channel":0,"chaptersTotal":0,"cat_name":"穿越重生"}]},{"title":"86%的书友都在搜索这本书","books":[{"id":0,"catId":3,"author":"落烟烟","bookname":"神秘总裁之蚀骨闪婚","brief":"整个丰城都在看叶栗的笑话，看着她从名媛变成贫民，但所有人都没想到....","cover":"https://wnzsapp.oss-cn-shanghai.aliyuncs.com/uploads/novel/121802588161.png?x-oss-process=image/resize,m_mfit,h_256,w_192/format,webp","updateStatus":0,"keyweight":0,"evaScore":0.0,"totalUsers":0,"readingNum":9688,"nid":5420,"favoriteNum":0,"avgScore":0.0,"praiseNum":0,"channel":0,"chaptersTotal":0,"cat_name":"现代言情"}]},{"title":"书荒加油站","books":[{"id":0,"catId":3,"author":"谨羽","bookname":"天价萌宝：总裁爹地超给力","brief":"“偷了我的基因想不认帐？”他逮住她，要她交出6年前生的宝宝。她死活不愿交出儿子，他只好纡尊降贵的对她死缠烂打，更是扬言要求同居。“爸爸，妈妈和别的叔叔跑了。”某宝告密。“派人给我追，绑回来家法伺候。”某男大怒。她只是和同事一块儿去出差，哪里是和别的男人跑路。于是，以后的每天某宝看到妈妈总是扶着墙下楼，然后爸爸笑的意犹未尽。","cover":"https://wnzsapp.oss-cn-shanghai.aliyuncs.com/uploads/novel/161916911617.jpg?x-oss-process=image/resize,m_mfit,h_256,w_192/format,webp","updateStatus":0,"keyweight":0,"evaScore":0.0,"totalUsers":0,"readingNum":14216,"nid":7152,"favoriteNum":0,"avgScore":0.0,"praiseNum":0,"channel":0,"chaptersTotal":0,"cat_name":"现代言情"}]}]}}
+用例测试结果:   t_007----&gt;pass
+检查点-&gt;："data":
+返回实际结果-&gt;：{"status":true,"data":{"pages":17,"list":[{"title":"猜你喜欢","books":[{"id":0,"catId":2,"author":"某R","bookname":"王爷，妾身今晚不侍寝","brief":"如有来世，我愿偿还今生所有的债，无所欠，无所负。\r\n如有来世，我愿……再看一眼你含笑的容颜。","cover":"https://wnzsapp.oss-cn-shanghai.aliyuncs.com/uploads/novel/308801437697.jpg?x-oss-process=image/resize,m_mfit,h_256,w_192/format,webp","updateStatus":1,"keyweight":0,"evaScore":0.0,"totalUsers":0,"readingNum":952,"nid":11080,"favoriteNum":0,"avgScore":0.0,"praiseNum":0,"channel":0,"chaptersTotal":0,"cat_name":"古代言情"}]},{"title":"好看到停不下来的热门书籍","books":[{"id":0,"catId":3,"author":"海阔天空","bookname":"慕先生，你晚到的这些年","brief":"她为救母命，躺在妹夫身下，被利用得一干二净。\r\n五年后，她带着萌宝归来，发誓要让害她的人付出代价！","cover":"https://wnzsapp.oss-cn-shanghai.aliyuncs.com/uploads/novel/215956324353.jpg?x-oss-process=image/resize,m_mfit,h_256,w_192/format,webp","updateStatus":1,"keyweight":0,"evaScore":0.0,"totalUsers":0,"readingNum":1355,"nid":7811,"favoriteNum":0,"avgScore":0.0,"praiseNum":0,"channel":0,"chaptersTotal":0,"cat_name":"现代言情"}]},{"title":"穿越种田：自己动手丰衣足食","books":[{"id":0,"catId":22,"author":"紫狼蝶","bookname":"系统农女：猎户强宠小娘子","brief":"    苦逼穿越，成了爹不疼娘不爱的农家女。 为了吃饱穿暖，她撸起袖子加油干，没想到捡了个宝盒，教她造大棚，种鲜蔬。 但是，光享受福利可不行，还要完成任务，帮宝盒升级。 五级是个木宝盒，十五级变为铁宝盒… 任务越变态，福利越诱人。 就这样，她种田耕地，放牧种树，凭着自己的双手改变命运，只是，她难得大发两次善心，怎么就给自己招惹来个麻烦的小毛头。 莫名成了孩儿他娘也就算了，为啥她又莫名和那个有名无实的猎户夫君生米成熟饭？ 我说这位大哥，咱有话好说，宝盒没说过，假戏真做也是我的任务之一啊\r\n\r\n","cover":"https://wnzsapp.oss-cn-shanghai.aliyuncs.com/uploads/novel/161833025537.jpg?x-oss-process=image/resize,m_mfit,h_256,w_192/format,webp","updateStatus":1,"keyweight":0,"evaScore":0.0,"totalUsers":0,"readingNum":448,"nid":7147,"favoriteNum":0,"avgScore":0.0,"praiseNum":0,"channel":0,"chaptersTotal":0,"cat_name":"穿越重生"}]},{"title":"吸血鬼殿下也柔情","books":[{"id":0,"catId":3,"author":"拾月","bookname":"一咬定情：吸血鬼总裁的专宠","brief":"“不要，不要了……”\r\n她脸色苍白，无力的推搡着。\r\n男人抚上她的脖子，眼眸深沉，粗重的喘息在她的耳边，“最后一口，一口就好……”\r\n她在路上随便捡了个美男，却没想到从此不只要卖血还要卖身。\r\n“你说好最后一口的……”\r\n“正常的男人都是吃荤的……”\r\n“唔——”","cover":"https://wnzsapp.oss-cn-shanghai.aliyuncs.com/uploads/novel/13639876609.jpg?x-oss-process=image/resize,m_mfit,h_256,w_192/format,webp","updateStatus":1,"keyweight":0,"evaScore":0.0,"totalUsers":0,"readingNum":1101,"nid":609,"favoriteNum":0,"avgScore":0.0,"praiseNum":0,"channel":0,"chaptersTotal":0,"cat_name":"现代言情"}]},{"title":"爱娱乐圈的姐妹看这里","books":[{"id":0,"catId":22,"author":"天容","bookname":"蜜爱百分百：重生影后太撩人","brief":"她前世为渣男所害，重生后立志报复。纵然是……“贺天擎,我不爱你，我只是在利用你！”贺天擎一脸邪笑盯着冬青道：“利用？我不在乎，现在你用完我了，是不是该我用你了?”“你……你要干嘛！”“你，说呢？”","cover":"https://wnzsapp.oss-cn-shanghai.aliyuncs.com/uploads/novel/162470559745.jpg?x-oss-process=image/resize,m_mfit,h_256,w_192/format,webp","updateStatus":0,"keyweight":0,"evaScore":0.0,"totalUsers":0,"readingNum":1239,"nid":7183,"favoriteNum":0,"avgScore":0.0,"praiseNum":0,"channel":0,"chaptersTotal":0,"cat_name":"穿越重生"}]},{"title":"高贵总裁 在线追妻","books":[{"id":0,"catId":3,"author":"青青子衿","bookname":"甜妻外嫁，总裁要劫婚","brief":"第一次见面，她喝醉酒死死缠着他不放。第二次见面，她被继母陷害昏迷，他替她出了头。第三次见面，他把她堵在墙角：“我救了你，你怎么报答我？”当她如愿嫁给了他之后，占有欲极强的他简直寸步不离，把她霸占的死死的，动不动就要撒狗粮…忍无可忍的她抱着儿子逃到“天涯海角”，千里寻爹的小包子发话：快去把妈咪和我接回来！某女欲哭无泪，现在后悔还来得及吗？","cover":"https://wnzsapp.oss-cn-shanghai.aliyuncs.com/uploads/novel/171463147521.jpg?x-oss-process=image/resize,m_mfit,h_256,w_192/format,webp","updateStatus":1,"keyweight":0,"evaScore":0.0,"totalUsers":0,"readingNum":8188,"nid":7637,"favoriteNum":0,"avgScore":0.0,"praiseNum":0,"channel":0,"chaptersTotal":0,"cat_name":"现代言情"}]},{"title":"小编精选 告别书荒","books":[{"id":0,"catId":22,"author":"北溪浅笑","bookname":"医妃嫁到请接驾","brief":" 丞相府二小姐，众人眼中的废物、丑女。长得丑，她被人唾弃、厌恶，被太子悔婚。皇上用她羞辱凌王，被冤枉是刺客内应遭人鞭打致死。 同名同姓不同灵魂，现在的苏婠央是国家特种训练的药剂师。天下没有她解不开的毒，治不好的病！ 王爷你嫌我丑？没关系，那我蒙着脸。 然，皇上寿宴，那想要羞辱她的人在扯下那从不离身的面纱之后，看到的是天仙亦不可媲美的美人儿。 太子后悔了？恩恩，让他后悔去吧。 王爷心动了？嘿嘿，殿下，您不是说您不是以貌取人的人么？ ","cover":"https://wnzsapp.oss-cn-shanghai.aliyuncs.com/uploads/novel/67494739969.jpg?x-oss-process=image/resize,m_mfit,h_256,w_192/format,webp","updateStatus":1,"keyweight":0,"evaScore":0.0,"totalUsers":0,"readingNum":12651,"nid":2738,"favoriteNum":0,"avgScore":0.0,"praiseNum":0,"channel":0,"chaptersTotal":0,"cat_name":"穿越重生"}]},{"title":"本周内搜索飙升好书","books":[{"id":0,"catId":3,"author":"江晚晚","bookname":"纵情","brief":"这是我做情妇的第二个年头，圈里的姐妹都叫我一姐，羡慕我现在的地位，\r\n却不知那些年，我为了生存的辛酸于悲哀......","cover":"https://wnzsapp.oss-cn-shanghai.aliyuncs.com/uploads/novel/153545080833.jpg?x-oss-process=image/resize,m_mfit,h_256,w_192/format,webp","updateStatus":1,"keyweight":0,"evaScore":0.0,"totalUsers":0,"readingNum":9073,"nid":6778,"favoriteNum":0,"avgScore":0.0,"praiseNum":0,"channel":0,"chaptersTotal":0,"cat_name":"现代言情"}]},{"title":"渣男回头，问你还敢不敢爱","books":[{"id":0,"catId":3,"author":"苏凉","bookname":"先离后爱：豪门下堂妻","brief":"五年的婚姻随着他初恋的回来而结束，他弃她如敝履，她黯然退场。\r\n五年后，她带着幼子回归，却不想，前夫竟一次又一次的纠缠。\r\n","cover":"https://wnzsapp.oss-cn-shanghai.aliyuncs.com/uploads/novel/190186520577.jpg?x-oss-process=image/resize,m_mfit,h_256,w_192/format,webp","updateStatus":1,"keyweight":0,"evaScore":0.0,"totalUsers":0,"readingNum":2701,"nid":8699,"favoriteNum":0,"avgScore":0.0,"praiseNum":0,"channel":0,"chaptersTotal":0,"cat_name":"现代言情"}]},{"title":"豪门甜宠文","books":[{"id":0,"catId":3,"author":"蒗蔚","bookname":"总裁你悠着点","brief":" 因为背叛，她和同学来到酒吧，本就只想借酒浇愁，但却来了一场放纵，遇上了他。 他是神秘的厉少，他说：“把你的一生交给我吧！”他说：“你的痛苦，我来解决。你的快乐，我给。 她是孤零零奋斗在自己人生的一名小设计家，被同学嫉妒她的才华，被家人讨厌她的存在。 然而，就在遇见他之后，当她振臂欢呼想要清除人生道路上的各种障碍时，只剩一阵凉风轻轻地飘了过来，暗示着她，你就随便走一走，前面便是康庄大道。 此刻她心中万马奔腾，总裁啊，你就不能悠着点？这让她还怎么愉快的和他们玩耍。","cover":"https://wnzsapp.oss-cn-shanghai.aliyuncs.com/uploads/novel/155122139137.jpg?x-oss-process=image/resize,m_mfit,h_256,w_192/format,webp","updateStatus":1,"keyweight":0,"evaScore":0.0,"totalUsers":0,"readingNum":1604,"nid":6846,"favoriteNum":0,"avgScore":0.0,"praiseNum":0,"channel":0,"chaptersTotal":0,"cat_name":"现代言情"}]},{"title":"这个冥王很高冷","books":[{"id":0,"catId":2,"author":"默默","bookname":"绝色狂妃：冥王的天才宠妃","brief":"刚穿越就发现自己怀孕，孩子他爹还是已故的战神冥王....","cover":"https://wnzsapp.oss-cn-shanghai.aliyuncs.com/uploads/novel/121819365377.png?x-oss-process=image/resize,m_mfit,h_256,w_192/format,webp","updateStatus":0,"keyweight":0,"evaScore":0.0,"totalUsers":0,"readingNum":1669,"nid":5421,"favoriteNum":0,"avgScore":0.0,"praiseNum":0,"channel":0,"chaptersTotal":0,"cat_name":"古代言情"}]},{"title":"婚后甜宠文 ","books":[{"id":0,"catId":3,"author":"御妖","bookname":"豪门溺宠：陆少的千亿娇妻","brief":"她以为她在复仇路上捡到的是个软柿子，谁知竟然是只小狼狗！这只小狼狗不但有权有势！黑夜里更是大野狼！","cover":"https://wnzsapp.oss-cn-shanghai.aliyuncs.com/uploads/novel/162487336961.jpg?x-oss-process=image/resize,m_mfit,h_256,w_192/format,webp","updateStatus":0,"keyweight":0,"evaScore":0.0,"totalUsers":0,"readingNum":3804,"nid":7184,"favoriteNum":0,"avgScore":0.0,"praiseNum":0,"channel":0,"chaptersTotal":0,"cat_name":"现代言情"}]},{"title":"萌宝驾到 甜宠不断","books":[{"id":0,"catId":3,"author":"任朝暮","bookname":"霸爱烈恋：跟着老婆走","brief":"在庄宇琛眼里，眼前这个女人唯利试图，水性杨花，但却让他难以自拔，一退再退。对于沈安而言，婚姻留给她无边的痛苦，她为了复仇而生，却又沉浸在那个男人霸道温柔的手段之下。","cover":"https://wnzsapp.oss-cn-shanghai.aliyuncs.com/uploads/novel/305580212225.jpg?x-oss-process=image/resize,m_mfit,h_256,w_192/format,webp","updateStatus":0,"keyweight":0,"evaScore":0.0,"totalUsers":0,"readingNum":3006,"nid":11090,"favoriteNum":0,"avgScore":0.0,"praiseNum":0,"channel":0,"chaptersTotal":0,"cat_name":"现代言情"}]},{"title":"总裁霸爱入坑不亏","books":[{"id":0,"catId":3,"author":"谨羽","bookname":"天价萌宝：总裁爹地超给力","brief":"“偷了我的基因想不认帐？”他逮住她，要她交出6年前生的宝宝。她死活不愿交出儿子，他只好纡尊降贵的对她死缠烂打，更是扬言要求同居。“爸爸，妈妈和别的叔叔跑了。”某宝告密。“派人给我追，绑回来家法伺候。”某男大怒。她只是和同事一块儿去出差，哪里是和别的男人跑路。于是，以后的每天某宝看到妈妈总是扶着墙下楼，然后爸爸笑的意犹未尽。","cover":"https://wnzsapp.oss-cn-shanghai.aliyuncs.com/uploads/novel/161916911617.jpg?x-oss-process=image/resize,m_mfit,h_256,w_192/format,webp","updateStatus":0,"keyweight":0,"evaScore":0.0,"totalUsers":0,"readingNum":14216,"nid":7152,"favoriteNum":0,"avgScore":0.0,"praiseNum":0,"channel":0,"chaptersTotal":0,"cat_name":"现代言情"}]},{"title":"准备好纸巾，这本书虐哭了","books":[{"id":0,"catId":2,"author":"月斜影清","bookname":"霸宠腹黑王妃","brief":"一觉醒来，竟然发现自己被绑了，那个男人怎么回事，拿一本《素女心经》问我哪里来的刺客？\r\n咦，这哪里是《素女心经》，明明是春宫图....","cover":"https://wnzsapp.oss-cn-shanghai.aliyuncs.com/uploads/novel/5083496449.jpg?x-oss-process=image/resize,m_mfit,h_256,w_192/format,webp","updateStatus":1,"keyweight":0,"evaScore":0.0,"totalUsers":0,"readingNum":446,"nid":137,"favoriteNum":0,"avgScore":0.0,"praiseNum":0,"channel":0,"chaptersTotal":0,"cat_name":"古代言情"}]},{"title":"总裁溺爱甜到发鼾","books":[{"id":0,"catId":3,"author":"写书的老外","bookname":"独家爆料：惹上网红老婆","brief":"一场再普通不过的新闻爆料，作为坐拥几千万微博粉丝的博主，柰小金不淡定了，不就是报道你堂堂博世总裁婚内出轨了吗？\r\n外加出轨双性恋了吗？双性恋又SM吗？SM又群嗨了吗？群嗨还喜欢野战找刺激吗？\r\n这点小事也劳烦您把我这大V博主绑回来小皮鞭子抽吗？","cover":"https://wnzsapp.oss-cn-shanghai.aliyuncs.com/uploads/novel/14629732353.jpg?x-oss-process=image/resize,m_mfit,h_256,w_192/format,webp","updateStatus":1,"keyweight":0,"evaScore":0.0,"totalUsers":0,"readingNum":220,"nid":663,"favoriteNum":0,"avgScore":0.0,"praiseNum":0,"channel":0,"chaptersTotal":0,"cat_name":"现代言情"}]},{"title":"你想要的温柔总裁都有","books":[{"id":0,"catId":3,"author":"陌凉","bookname":"盛宠101分：晏少撩妻过度","brief":"因为私生女的身份，被男朋友嫌弃了，不仅跟她分手还光明正大的跟她姐好上了。祝晨曦转身撩了个一脸禁欲的男人。但是说好的禁欲系人设呢？人人都说这个男人寡情寡欲，没有兴趣爱好，却只有祝晨曦知道，这个男人人前高冷，人后荡漾，出门衣冠，进门禽畜，这才是最真实的。","cover":"https://wnzsapp.oss-cn-shanghai.aliyuncs.com/uploads/novel/162437005313.jpg?x-oss-process=image/resize,m_mfit,h_256,w_192/format,webp","updateStatus":0,"keyweight":0,"evaScore":0.0,"totalUsers":0,"readingNum":2603,"nid":7181,"favoriteNum":0,"avgScore":0.0,"praiseNum":0,"channel":0,"chaptersTotal":0,"cat_name":"现代言情"}]},{"title":"穿越一线牵 珍惜这段缘","books":[{"id":0,"catId":22,"author":"北溪浅笑","bookname":"医妃嫁到请接驾","brief":" 丞相府二小姐，众人眼中的废物、丑女。长得丑，她被人唾弃、厌恶，被太子悔婚。皇上用她羞辱凌王，被冤枉是刺客内应遭人鞭打致死。 同名同姓不同灵魂，现在的苏婠央是国家特种训练的药剂师。天下没有她解不开的毒，治不好的病！ 王爷你嫌我丑？没关系，那我蒙着脸。 然，皇上寿宴，那想要羞辱她的人在扯下那从不离身的面纱之后，看到的是天仙亦不可媲美的美人儿。 太子后悔了？恩恩，让他后悔去吧。 王爷心动了？嘿嘿，殿下，您不是说您不是以貌取人的人么？ ","cover":"https://wnzsapp.oss-cn-shanghai.aliyuncs.com/uploads/novel/67494739969.jpg?x-oss-process=image/resize,m_mfit,h_256,w_192/format,webp","updateStatus":1,"keyweight":0,"evaScore":0.0,"totalUsers":0,"readingNum":12651,"nid":2738,"favoriteNum":0,"avgScore":0.0,"praiseNum":0,"channel":0,"chaptersTotal":0,"cat_name":"穿越重生"}]},{"title":"穿越逆袭，丑女也有春天","books":[{"id":0,"catId":22,"author":"北溪浅笑","bookname":"本王不是妻奴","brief":"    东秦北子靖手握重兵，是个直男癌晚期患者。 “沈若溪，女人就应该乖乖待在后院，本王受伤了你给本王包扎，本王中毒了你给本王解毒，舞弄权势非女子所为。” 说着便默默把自己两军兵符、王府大权都给了她。王府侍卫们无语擦汗 “沈若溪，女人应该上得厅堂下得厨房，你以后要多在厨艺上下功夫。” 厨房里的大妈望着刚被王爷剥完的虾壳无语凝噎。 “沈若溪，女人就该以男人为尊。男人说一女人不能说二，你既然嫁给了本王，便什么都得听本王的。” 看着面前一本正经跪在搓衣板上的某人，沈若溪：“你说的很有道理，奖励你多跪半个时辰。&amp;","cover":"https://wnzsapp.oss-cn-shanghai.aliyuncs.com/uploads/novel/155055030273.jpg?x-oss-process=image/resize,m_mfit,h_256,w_192/format,webp","updateStatus":1,"keyweight":0,"evaScore":0.0,"totalUsers":0,"readingNum":7086,"nid":6842,"favoriteNum":0,"avgScore":0.0,"praiseNum":0,"channel":0,"chaptersTotal":0,"cat_name":"穿越重生"}]},{"title":"86%的书友都在搜索这本书","books":[{"id":0,"catId":3,"author":"落烟烟","bookname":"神秘总裁之蚀骨闪婚","brief":"整个丰城都在看叶栗的笑话，看着她从名媛变成贫民，但所有人都没想到....","cover":"https://wnzsapp.oss-cn-shanghai.aliyuncs.com/uploads/novel/121802588161.png?x-oss-process=image/resize,m_mfit,h_256,w_192/format,webp","updateStatus":0,"keyweight":0,"evaScore":0.0,"totalUsers":0,"readingNum":9688,"nid":5420,"favoriteNum":0,"avgScore":0.0,"praiseNum":0,"channel":0,"chaptersTotal":0,"cat_name":"现代言情"}]},{"title":"书荒加油站","books":[{"id":0,"catId":3,"author":"谨羽","bookname":"天价萌宝：总裁爹地超给力","brief":"“偷了我的基因想不认帐？”他逮住她，要她交出6年前生的宝宝。她死活不愿交出儿子，他只好纡尊降贵的对她死缠烂打，更是扬言要求同居。“爸爸，妈妈和别的叔叔跑了。”某宝告密。“派人给我追，绑回来家法伺候。”某男大怒。她只是和同事一块儿去出差，哪里是和别的男人跑路。于是，以后的每天某宝看到妈妈总是扶着墙下楼，然后爸爸笑的意犹未尽。","cover":"https://wnzsapp.oss-cn-shanghai.aliyuncs.com/uploads/novel/161916911617.jpg?x-oss-process=image/resize,m_mfit,h_256,w_192/format,webp","updateStatus":0,"keyweight":0,"evaScore":0.0,"totalUsers":0,"readingNum":14216,"nid":7152,"favoriteNum":0,"avgScore":0.0,"praiseNum":0,"channel":0,"chaptersTotal":0,"cat_name":"现代言情"}]}]}}
+
+
+        </pre>
+    </div>
+    <!--css div popup end-->
+
+    </td>
+    <td></td>
+</tr>
+
+<tr id='pt1.7' class='hiddenRow'>
+    <td ><div class='testcase'>test_api_07</div></td>
+    <td colspan='5' align='center'>
+
+    <!--css div popup start-->
+    <span class='status passCase'>
+    <a class="popup_link" onfocus='this.blur();' href="javascript:showTestDetail('div_pt1.7')" >
+        通过</a></span>
+
+    <div id='div_pt1.7' class="popup_window">
+        <div style='text-align: right; color:red;cursor:pointer'>
+        <a onfocus='this.blur();' onclick="document.getElementById('div_pt1.7').style.display = 'none' " >
+           [x]</a>
+        </div>
+        <pre>
+        
+pt1.7: 请求头部：{'Content-Type': 'application/x-www-form-urlencoded'}
+*******正在执行用例：-----  t_008  ----**********
+请求方式：post, 请求url:http://apiprd.zhuishubao.com/appprogram/fiction/book-mall-carousel
+请求params：None
+post请求body类型为：data ,body内容为：{'version': '2', 'cat_id': '1', 'device_id': '20'}
+页面返回信息：{"status":true,"data":{"list":[]}}
+用例测试结果:   t_008----&gt;pass
+检查点-&gt;："data":
+返回实际结果-&gt;：{"status":true,"data":{"list":[]}}
+
+
+        </pre>
+    </div>
+    <!--css div popup end-->
+
+    </td>
+    <td></td>
+</tr>
+
+<tr id='pt1.8' class='hiddenRow'>
+    <td ><div class='testcase'>test_api_08</div></td>
+    <td colspan='5' align='center'>
+
+    <!--css div popup start-->
+    <span class='status passCase'>
+    <a class="popup_link" onfocus='this.blur();' href="javascript:showTestDetail('div_pt1.8')" >
+        通过</a></span>
+
+    <div id='div_pt1.8' class="popup_window">
+        <div style='text-align: right; color:red;cursor:pointer'>
+        <a onfocus='this.blur();' onclick="document.getElementById('div_pt1.8').style.display = 'none' " >
+           [x]</a>
+        </div>
+        <pre>
+        
+pt1.8: 请求头部：{'Content-Type': 'application/x-www-form-urlencoded'}
+*******正在执行用例：-----  t_009  ----**********
+请求方式：post, 请求url:http://apiprd.zhuishubao.com/appprogram/fiction-chapter/chapter-list
+请求params：None
+post请求body类型为：data ,body内容为：{'id': '7151', 'version': '2', 'device_id': '860604044727590'}
+页面返回信息：{"status":true,"data":{"list":[{"chapter_id":6347560,"title":"第1章初到","chapnum":1,"status":2},{"chapter_id":6347570,"title":"第2章不正常","chapnum":2,"status":2},{"chapter_id":6347589,"title":"第3章接你回家","chapnum":3,"status":2},{"chapter_id":6347599,"title":"第4章嘱咐","chapnum":4,"status":2},{"chapter_id":6347609,"title":"第5章试探","chapnum":5,"status":2},{"chapter_id":6347620,"title":"第6章男女有别","chapnum":6,"status":2},{"chapter_id":6347631,"title":"第7章我，走了","chapnum":7,"status":2},{"chapter_id":6347639,"title":"第8章进府","chapnum":8,"status":2},{"chapter_id":6347651,"title":"第9章叶家老祖","chapnum":9,"status":2},{"chapter_id":6347663,"title":"第10章终相见","chapnum":10,"status":2},{"chapter_id":6347673,"title":"第11章 父女初对话","chapnum":11,"status":2},{"chapter_id":6347682,"title":"第12章 老嬷嬷","chapnum":12,"status":2},{"chapter_id":6347690,"title":"第13章 倒打一耙","chapnum":13,"status":2},{"chapter_id":6347707,"title":"第14章 闹开了","chapnum":14,"status":2},{"chapter_id":6347718,"title":"第15章 我要回家","chapnum":15,"status":2},{"chapter_id":6347730,"title":"第16章 都来了","chapnum":16,"status":2},{"chapter_id":6347741,"title":"第17章 要银子","chapnum":17,"status":2},{"chapter_id":6347749,"title":"第18章 没好人","chapnum":18,"status":2},{"chapter_id":6347762,"title":"第19章 财迷样","chapnum":19,"status":2},{"chapter_id":6347777,"title":"第20章 心思","chapnum":20,"status":2},{"chapter_id":6347787,"title":"第21章 丢东西了","chapnum":21,"status":2},{"chapter_id":6347800,"title":"第22章  我自有娘亲","chapnum":22,"status":2},{"chapter_id":6347812,"title":"第23章 算计女儿的父亲","chapnum":23,"status":2},{"chapter_id":6347824,"title":"第24章 自己选","chapnum":24,"status":2},{"chapter_id":6347835,"title":"第25章 够狠","chapnum":25,"status":2},{"chapter_id":6347849,"title":"第26章 拆台","chapnum":26,"status":2},{"chapter_id":6347857,"title":"第27章  二楞子","chapnum":27,"status":2},{"chapter_id":6347871,"title":"第28章 动口不动手","chapnum":28,"status":2},{"chapter_id":6347882,"title":"第29章 战斗力","chapnum":29,"status":2},{"chapter_id":6347890,"title":"第30章 他来了","chapnum":30,"status":2},{"chapter_id":6347905,"title":"第31章 玉恒公子","chapnum":31,"status":2},{"chapter_id":6347910,"title":"第32章  叶家姑娘","chapnum":32,"status":2},{"chapter_id":6347921,"title":"第33章 玉脂膏","chapnum":33,"status":2},{"chapter_id":6347932,"title":"第34章  生存法则","chapnum":34,"status":2},{"chapter_id":6347944,"title":"第35章 突如其来的陷害","chapnum":35,"status":2},{"chapter_id":6347954,"title":"第36章 学规矩","chapnum":36,"status":2},{"chapter_id":6347965,"title":"第37章 出贼了","chapnum":37,"status":2},{"chapter_id":6347974,"title":"第38章 老太爷到","chapnum":38,"status":2},{"chapter_id":6347985,"title":"第39章 怪现象","chapnum":39,"status":2},{"chapter_id":6347996,"title":"第40章 凭证","chapnum":40,"status":2},{"chapter_id":6348005,"title":"第41章 我的玉","chapnum":41,"status":2},{"chapter_id":6348016,"title":"第42章 都叫来","chapnum":42,"status":2},{"chapter_id":6348025,"title":"第43章 打起来了","chapnum":43,"status":2},{"chapter_id":6348035,"title":"第44章  我来治","chapnum":44,"status":2},{"chapter_id":6348045,"title":"第45章 是真晕","chapnum":45,"status":2},{"chapter_id":6348054,"title":"第46章 坑娘的娃","chapnum":46,"status":2},{"chapter_id":6348065,"title":"第47章 套话","chapnum":47,"status":2},{"chapter_id":6348080,"title":"第48章 老太爷怒","chapnum":48,"status":2},{"chapter_id":6348088,"title":"第49章 出气筒","chapnum":49,"status":2},{"chapter_id":6348102,"title":"第50章 讲道理","chapnum":50,"status":2},{"chapter_id":6348113,"title":"第51章 加把火","chapnum":51,"status":2},{"chapter_id":6348120,"title":"第52章 雷声大雨点小","chapnum":52,"status":2},{"chapter_id":6348132,"title":"第53章 处罚","chapnum":53,"status":2},{"chapter_id":6348141,"title":"第54章 一家人","chapnum":54,"status":2},{"chapter_id":6348153,"title":"第55章 落井下石","chapnum":55,"status":2},{"chapter_id":6348165,"title":"第56章 一唱一和","chapnum":56,"status":2},{"chapter_id":6348179,"title":"第57章 大实话","chapnum":57,"status":2},{"chapter_id":6348190,"title":"第58章 撒气","chapnum":58,"status":2},{"chapter_id":6348204,"title":"第59章 孝大于天","chapnum":59,"status":2},{"chapter_id":6348213,"title":"第60章 生养之恩","chapnum":60,"status":2},{"chapter_id":6348223,"title":"第61章 仁至义尽","chapnum":61,"status":2},{"chapter_id":6348235,"title":"第62章 一起忍","chapnum":62,"status":2},{"chapter_id":6348250,"title":"第63章 恶女人","chapnum":63,"status":2},{"chapter_id":6348261,"title":"第64章 你姓吕","chapnum":64,"status":2},{"chapter_id":6348275,"title":"第65章 碎了","chapnum":65,"status":2},{"chapter_id":6348285,"title":"第66章 都晕了","chapnum":66,"status":2},{"chapter_id":6348295,"title":"第67章 大闹","chapnum":67,"status":2},{"chapter_id":6348306,"title":"第68章 赶人","chapnum":68,"status":2},{"chapter_id":6348322,"title":"第69章 好算盘","chapnum":69,"status":2},{"chapter_id":6348335,"title":"第70章 重点","chapnum":70,"status":2},{"chapter_id":6348344,"title":"第71章 家信","chapnum":71,"status":2},{"chapter_id":6348354,"title":"第72章 什么事","chapnum":72,"status":2},{"chapter_id":6348365,"title":"第73章 夜半来客","chapnum":73,"status":2},{"chapter_id":6348376,"title":"第74章 又要算计","chapnum":74,"status":2},{"chapter_id":6348389,"title":"第75章 配合","chapnum":75,"status":2},{"chapter_id":6348397,"title":"第76章 被动","chapnum":76,"status":2},{"chapter_id":6348407,"title":"第77章 气醒了","chapnum":77,"status":2},{"chapter_id":6348417,"title":"第78章 照顾","chapnum":78,"status":2},{"chapter_id":6348430,"title":"第79章 小心被人听到","chapnum":79,"status":2},{"chapter_id":6348439,"title":"第80章 见外室","chapnum":80,"status":2},{"chapter_id":6348452,"title":"第81章 妻妾相见","chapnum":81,"status":2},{"chapter_id":6348466,"title":"第82章 漂亮反击","chapnum":82,"status":2},{"chapter_id":6348481,"title":"第83章 不同的方式","chapnum":83,"status":2},{"chapter_id":6348492,"title":"第84章 吓唬","chapnum":84,"status":2},{"chapter_id":6348502,"title":"第85章 态度强硬","chapnum":85,"status":2},{"chapter_id":6348513,"title":"第86章 大谎话","chapnum":86,"status":2},{"chapter_id":6348522,"title":"第87章 心火旺","chapnum":87,"status":2},{"chapter_id":6348531,"title":"第88章 请客","chapnum":88,"status":2},{"chapter_id":6348544,"title":"第89章 嫡庶之别","chapnum":89,"status":2},{"chapter_id":6348561,"title":"第90章 谋算","chapnum":90,"status":2},{"chapter_id":6348572,"title":"第91章 假的？","chapnum":91,"status":2},{"chapter_id":6348584,"title":"第92章 两不相帮","chapnum":92,"status":2},{"chapter_id":6348603,"title":"第93章 月色正好","chapnum":93,"status":2},{"chapter_id":6348611,"title":"第94章 私会","chapnum":94,"status":2},{"chapter_id":6348620,"title":"第95章 被发现了","chapnum":95,"status":2},{"chapter_id":6348631,"title":"第96章 书香门弟","chapnum":96,"status":2},{"chapter_id":6348641,"title":"第97章 傻女人","chapnum":97,"status":2},{"chapter_id":6348651,"title":"第98章 古怪","chapnum":98,"status":2},{"chapter_id":6348660,"title":"第99章 夫人病了","chapnum":99,"status":2},{"chapter_id":6348685,"title":"第100章 我来了","chapnum":100,"status":2},{"chapter_id":6348695,"title":"第101章 女肖父","chapnum":101,"status":2},{"chapter_id":6348708,"title":"第102章 拿刀来","chapnum":102,"status":2},{"chapter_id":6348722,"title":"第103章 真正的高人","chapnum":103,"status":2},{"chapter_id":6348737,"title":"第104章 罪名","chapnum":104,"status":2},{"chapter_id":6348754,"title":"第105章 借势","chapnum":105,"status":2},{"chapter_id":6348761,"title":"第106章 叫破与变脸","chapnum":106,"status":2},{"chapter_id":6348771,"title":"第107章 初次配合","chapnum":107,"status":2},{"chapter_id":6348788,"title":"第108章 一个理由","chapnum":108,"status":2},{"chapter_id":6348795,"title":"第109章 聪明的女人","chapnum":109,"status":2},{"chapter_id":6348804,"title":"第110章 叶家女儿","chapnum":110,"status":2},{"chapter_id":6348816,"title":"第111章 怒打白莲","chapnum":111,"status":2},{"chapter_id":6348824,"title":"第112章 别捂了","chapnum":112,"status":2},{"chapter_id":6348836,"title":"第113章 谁不知廉耻","chapnum":113,"status":2},{"chapter_id":6348847,"title":"第114章 得理不饶人","chapnum":114,"status":2},{"chapter_id":6348858,"title":"第115章 不干了","chapnum":115,"status":2},{"chapter_id":6348870,"title":"第116章 喜欢谁","chapnum":116,"status":2},{"chapter_id":6348876,"title":"第117章 丫鬟生涯","chapnum":117,"status":2},{"chapter_id":6348887,"title":"第118章 东风到","chapnum":118,"status":2},{"chapter_id":6348897,"title":"第119章 陪着你","chapnum":119,"status":2},{"chapter_id":6348908,"title":"第120章 说话厚道","chapnum":120,"status":2},{"chapter_id":6348922,"title":"第121章 老夫人有请","chapnum":121,"status":2},{"chapter_id":6348933,"title":"第122章 被告状","chapnum":122,"status":2},{"chapter_id":6348939,"title":"第123章 有规矩是好事","chapnum":123,"status":2},{"chapter_id":6348950,"title":"第124章 是谁？","chapnum":124,"status":2},{"chapter_id":6348963,"title":"第125章 走一遭","chapnum":125,"status":2},{"chapter_id":6348976,"title":"第126章 叶家门风","chapnum":126,"status":2},{"chapter_id":6348985,"title":"第127章 不管了","chapnum":127,"status":2},{"chapter_id":6348996,"title":"第128章 妻妾斗","chapnum":128,"status":2},{"chapter_id":6349005,"title":"第129章 屋子被搜","chapnum":129,"status":2},{"chapter_id":6349020,"title":"第130章 我来助你","chapnum":130,"status":2},{"chapter_id":6349030,"title":"第131章 步步紧逼","chapnum":131,"status":2},{"chapter_id":6349041,"title":"第132章 哑巴亏","chapnum":132,"status":2},{"chapter_id":6349053,"title":"第133章 又一个高手","chapnum":133,"status":2},{"chapter_id":6349064,"title":"第134章 又添人","chapnum":134,"status":2},{"chapter_id":6349078,"title":"第135章 到齐了","chapnum":135,"status":2},{"chapter_id":6349089,"title":"第136章 拒绝","chapnum":136,"status":2},{"chapter_id":6349102,"title":"第137章 主母的气势","chapnum":137,"status":2},{"chapter_id":6349117,"title":"第138章 混水才好摸鱼","chapnum":138,"status":2},{"chapter_id":6349128,"title":"第139章 有人来过","chapnum":139,"status":2},{"chapter_id":6349139,"title":"第140章 倚仗和钥匙","chapnum":140,"status":2},{"chapter_id":6349150,"title":"第141章  今日是东风","chapnum":141,"status":2},{"chapter_id":6349159,"title":"第142章 好计划","chapnum":142,"status":2},{"chapter_id":6349170,"title":"第143章 无事不登门","chapnum":143,"status":2},{"chapter_id":6349180,"title":"第144章 劝","chapnum":144,"status":2},{"chapter_id":6349190,"title":"第145章 有难度","chapnum":145,"status":2},{"chapter_id":6349198,"title":"第146章 一起走","chapnum":146,"status":2},{"chapter_id":6349210,"title":"第147章 邀请","chapnum":147,"status":2},{"chapter_id":6349222,"title":"第148章 吕焕的主意","chapnum":148,"status":2},{"chapter_id":6349231,"title":"第149章 打渣男","chapnum":149,"status":2},{"chapter_id":6349242,"title":"第150章 找上门","chapnum":150,"status":2},{"chapter_id":6349254,"title":"第151章 讲道理","chapnum":151,"status":2},{"chapter_id":6349267,"title":"第152章 吕焕的下场","chapnum":152,"status":2},{"chapter_id":6349278,"title":"第153章 完美解决","chapnum":153,"status":2},{"chapter_id":6349291,"title":"第154章 诚意","chapnum":154,"status":2},{"chapter_id":6349300,"title":"第155章 牢不可破的交情","chapnum":155,"status":2},{"chapter_id":6349312,"title":"第156 不见了","chapnum":156,"status":2},{"chapter_id":6349328,"title":"第157章 后果","chapnum":157,"status":2},{"chapter_id":6349342,"title":"第158章 门口动手","chapnum":158,"status":2},{"chapter_id":6349353,"title":"第159章 再合作","chapnum":159,"status":2},{"chapter_id":6349365,"title":"第160章 四姑母打我","chapnum":160,"status":2},{"chapter_id":6349373,"title":"第161章 一家之主","chapnum":161,"status":2},{"chapter_id":6349386,"title":"第162章 无耻之极","chapnum":162,"status":2},{"chapter_id":6349398,"title":"第163章 威胁","chapnum":163,"status":2},{"chapter_id":6349408,"title":"第164章 都是可怜人","chapnum":164,"status":2},{"chapter_id":6349418,"title":"第165章 撕破脸","chapnum":165,"status":2},{"chapter_id":6349430,"title":"第166章 故意的","chapnum":166,"status":2},{"chapter_id":6349435,"title":"第167章 男人啊男人","chapnum":167,"status":2},{"chapter_id":6349444,"title":"第168章 处罚谁","chapnum":168,"status":2},{"chapter_id":6349461,"title":"第169章 还在算计","chapnum":169,"status":2},{"chapter_id":6349471,"title":"第170章 只要儿子","chapnum":170,"status":2},{"chapter_id":6349483,"title":"第171章 不放","chapnum":171,"status":2},{"chapter_id":6349495,"title":"第172章 你们都要走","chapnum":172,"status":2},{"chapter_id":6349507,"title":"第173章 为自己打算","chapnum":173,"status":2},{"chapter_id":6349522,"title":"第174章 笨女儿","chapnum":174,"status":2},{"chapter_id":6349530,"title":"第175章 后宅事","chapnum":175,"status":2},{"chapter_id":6349538,"title":"第176章 周府的怒火","chapnum":176,"status":2},{"chapter_id":6349546,"title":"第177章 周家夫人","chapnum":177,"status":2},{"chapter_id":6349559,"title":"第178章 赔礼来了","chapnum":178,"status":2},{"chapter_id":6349572,"title":"第179章 二夫人发威","chapnum":179,"status":2},{"chapter_id":6349581,"title":"第180章 您多担待","chapnum":180,"status":2},{"chapter_id":6349593,"title":"第181章 吐真言","chapnum":181,"status":2},{"chapter_id":6349605,"title":"第182章 疯了","chapnum":182,"status":2},{"chapter_id":6349615,"title":"第183章 思念","chapnum":183,"status":2},{"chapter_id":6349625,"title":"第184章 树大，招风 ","chapnum":184,"status":2},{"chapter_id":6349638,"title":"第185章 舅父请罪","chapnum":185,"status":2},{"chapter_id":6349649,"title":"第186章 周家的男人","chapnum":186,"status":2},{"chapter_id":6349656,"title":"第187章 定住了眼","chapnum":187,"status":2},{"chapter_id":6349667,"title":"第188章 听墙角","chapnum":188,"status":2},{"chapter_id":6349684,"title":"第189章 表哥的心思","chapnum":189,"status":2},{"chapter_id":6349695,"title":"第190章 吓了一跳","chapnum":190,"status":2},{"chapter_id":6349704,"title":"第191章 怎么见面 ","chapnum":191,"status":2},{"chapter_id":6349715,"title":"第192章 又一个弟弟","chapnum":192,"status":2},{"chapter_id":6349728,"title":"第193章 立威","chapnum":193,"status":2},{"chapter_id":6349741,"title":"第194章 帮忙","chapnum":194,"status":2},{"chapter_id":6349752,"title":"第195章 劝架方式","chapnum":195,"status":2},{"chapter_id":6349764,"title":"第196章 别的心思","chapnum":196,"status":2},{"chapter_id":6349773,"title":"第197章 都是狼","chapnum":197,"status":2},{"chapter_id":6349783,"title":"第198章 豁出去了","chapnum":198,"status":2},{"chapter_id":6349799,"title":"第199章  一个耳光","chapnum":199,"status":2},{"chapter_id":6349812,"title":"第200章 凉薄的亲情","chapnum":200,"status":2},{"chapter_id":6349825,"title":"第201章 好多同行","chapnum":201,"status":2},{"chapter_id":6349840,"title":"第202章 撬开她的嘴","chapnum":202,"status":2},{"chapter_id":6349852,"title":"第203章 丢尽脸面","chapnum":203,"status":2},{"chapter_id":6349863,"title":"第204章 毒菇出现","chapnum":204,"status":2},{"chapter_id":6349873,"title":"第205章 审姨娘","chapnum":205,"status":2},{"chapter_id":6349884,"title":"第206章 又脏又乱","chapnum":206,"status":2},{"chapter_id":6349895,"title":"第207章 狮子大开口","chapnum":207,"status":2},{"chapter_id":6349907,"title":"第208章 奴告主","chapnum":208,"status":2},{"chapter_id":6349915,"title":"第209章 着急","chapnum":209,"status":2},{"chapter_id":6349923,"title":"第210章 全是烦心事","chapnum":210,"status":2},{"chapter_id":6349932,"title":"第211章 倒打一耙","chapnum":211,"status":2},{"chapter_id":6349943,"title":"第212章 你是什么意思？","chapnum":212,"status":2},{"chapter_id":6349952,"title":"第213章 谁理亏","chapnum":213,"status":2},{"chapter_id":6349967,"title":"第214章 两件事","chapnum":214,"status":2},{"chapter_id":6349980,"title":"第215章 说服","chapnum":215,"status":2},{"chapter_id":6349990,"title":"第216章 老夫人有请","chapnum":216,"status":2},{"chapter_id":6350002,"title":"第217章 算计他","chapnum":217,"status":2},{"chapter_id":6350013,"title":"第218章 忍无可忍","chapnum":218,"status":2},{"chapter_id":6350030,"title":"第219章 落套","chapnum":219,"status":2},{"chapter_id":6350039,"title":"第220章 谣言害人","chapnum":220,"status":2},{"chapter_id":6350054,"title":"第221章 一条帕子","chapnum":221,"status":2},{"chapter_id":6350066,"title":"第222章 大闹","chapnum":222,"status":2},{"chapter_id":6350077,"title":"第223章 一言定终生","chapnum":223,"status":2},{"chapter_id":6350091,"title":"第224章 说说你的事","chapnum":224,"status":2},{"chapter_id":6350106,"title":"第225章 大尾巴狼","chapnum":225,"status":2},{"chapter_id":6350120,"title":"第226章 我来说","chapnum":226,"status":2},{"chapter_id":6350124,"title":"第227章 不合时宜的话","chapnum":227,"status":2},{"chapter_id":6350134,"title":"第228章 女人打架","chapnum":228,"status":2},{"chapter_id":6350145,"title":"第229章 自保","chapnum":229,"status":2},{"chapter_id":6350157,"title":"第230章 二房的算计","chapnum":230,"status":2},{"chapter_id":6350168,"title":"第231章 都给他","chapnum":231,"status":2},{"chapter_id":6350174,"title":"第232章 做了一回自己","chapnum":232,"status":2},{"chapter_id":6350191,"title":"第233章 都是钱惹的祸","chapnum":233,"status":2},{"chapter_id":6350201,"title":"第234章 清明的老祖宗","chapnum":234,"status":2},{"chapter_id":6350214,"title":"第235章 打算出叶府","chapnum":235,"status":2},{"chapter_id":6350226,"title":"第236章 早就写好的信","chapnum":236,"status":2},{"chapter_id":6350237,"title":"第237章 怒火","chapnum":237,"status":2},{"chapter_id":6350249,"title":"第238章 我疯了","chapnum":238,"status":2},{"chapter_id":6350261,"title":"第239章 砸东西","chapnum":239,"status":2},{"chapter_id":6350273,"title":"第240章 彻底爆发","chapnum":240,"status":2},{"chapter_id":6350284,"title":"第241章 包氏失踪","chapnum":241,"status":2},{"chapter_id":6350296,"title":"第242章 明天，认祖","chapnum":242,"status":2},{"chapter_id":6350305,"title":"第243章 论事","chapnum":243,"status":2},{"chapter_id":6350313,"title":"第244章 祸害遗千年","chapnum":244,"status":2},{"chapter_id":6350324,"title":"第245章 把柄","chapnum":245,"status":2},{"chapter_id":6350336,"title":"第246章 没有家","chapnum":246,"status":2},{"chapter_id":6350349,"title":"第247章 眼皮子浅","chapnum":247,"status":2},{"chapter_id":6350358,"title":"第248章 叶家的女人","chapnum":248,"status":2},{"chapter_id":6350367,"title":"第249章 九妹报信","chapnum":249,"status":2},{"chapter_id":6350378,"title":"第250章 有内鬼","chapnum":250,"status":2},{"chapter_id":6350389,"title":"第251章 被坑了","chapnum":251,"status":2},{"chapter_id":6350398,"title":"第252章 男女之分","chapnum":252,"status":2},{"chapter_id":6350405,"title":"第253章 表妹出场","chapnum":253,"status":2},{"chapter_id":6350417,"title":"第254章 与我何干","chapnum":254,"status":2},{"chapter_id":6350426,"title":"第255章 寻死","chapnum":255,"status":2},{"chapter_id":6350435,"title":"第256章 又来一个","chapnum":256,"status":2},{"chapter_id":6350447,"title":"第257章 说得好","chapnum":257,"status":2},{"chapter_id":6350454,"title":"第258章 不用留面子","chapnum":258,"status":2},{"chapter_id":6350463,"title":"第259章 事发","chapnum":259,"status":2},{"chapter_id":6350477,"title":"第260章 怎么补救","chapnum":260,"status":2},{"chapter_id":6350485,"title":"第261章 滚进来","chapnum":261,"status":2},{"chapter_id":6350495,"title":"第262章 姐弟","chapnum":262,"status":2},{"chapter_id":6350504,"title":"第263章 老实人的话","chapnum":263,"status":2},{"chapter_id":6350521,"title":"第264章 几个媳妇","chapnum":264,"status":2},{"chapter_id":6350526,"title":"第265章 嚣张的奴才","chapnum":265,"status":2},{"chapter_id":6350542,"title":"第266章 私相授受","chapnum":266,"status":2},{"chapter_id":6350548,"title":"第267章 你不配","chapnum":267,"status":2},{"chapter_id":6350560,"title":"第268章 逼问","chapnum":268,"status":2},{"chapter_id":6350571,"title":"第269章 不合时宜的教导","chapnum":269,"status":2},{"chapter_id":6350583,"title":"第270章 眼前报","chapnum":270,"status":2},{"chapter_id":6350589,"title":"第271章 先拿钱","chapnum":271,"status":2},{"chapter_id":6350602,"title":"第272章 他说谎","chapnum":272,"status":2},{"chapter_id":6350615,"title":"第273章 坏人的维护","chapnum":273,"status":2},{"chapter_id":6350622,"title":"第274章 一份子","chapnum":274,"status":2},{"chapter_id":6350633,"title":"第275章 乱成一团","chapnum":275,"status":2},{"chapter_id":6350643,"title":"第276章 算旧帐","chapnum":276,"status":2},{"chapter_id":6350660,"title":"第277章 左拥右抱","chapnum":277,"status":2},{"chapter_id":6350668,"title":"第278章 几件事","chapnum":278,"status":2},{"chapter_id":6350679,"title":"第279章 你猜","chapnum":279,"status":2},{"chapter_id":6350690,"title":"第280章 惊天秘密","chapnum":280,"status":2},{"chapter_id":6350700,"title":"第281章 是谁","chapnum":281,"status":2},{"chapter_id":6350712,"title":"第282章 不是他","chapnum":282,"status":2},{"chapter_id":6350720,"title":"第283章 你可真恨他","chapnum":283,"status":2},{"chapter_id":6350730,"title":"第284章 搅混水","chapnum":284,"status":2},{"chapter_id":6350741,"title":"第285章 你可以不听","chapnum":285,"status":2},{"chapter_id":6350751,"title":"第286章 叶氏族长","chapnum":286,"status":2},{"chapter_id":6350759,"title":"第287章 说漏嘴了","chapnum":287,"status":2},{"chapter_id":6350770,"title":"第288章 我先走了","chapnum":288,"status":2},{"chapter_id":6350779,"title":"第289章  又来坑人","chapnum":289,"status":2},{"chapter_id":6350793,"title":"第290章 几位贵妾","chapnum":290,"status":2},{"chapter_id":6350802,"title":"第291章 和我无关 ","chapnum":291,"status":2},{"chapter_id":6350816,"title":"第292章 夫妻大闹","chapnum":292,"status":2},{"chapter_id":6350827,"title":"第293章 新消息","chapnum":293,"status":2},{"chapter_id":6350838,"title":"第294章 有目的的兰儿","chapnum":294,"status":2},{"chapter_id":6350849,"title":"第295章 故意请教","chapnum":295,"status":2},{"chapter_id":6350856,"title":"第296章 我就是传话的","chapnum":296,"status":2},{"chapter_id":6350869,"title":"第297章 娘亲出现","chapnum":297,"status":2},{"chapter_id":6350880,"title":"第298章 娘要嫁人","chapnum":298,"status":2},{"chapter_id":6350891,"title":"第299章 我同意","chapnum":299,"status":2},{"chapter_id":6350903,"title":"第300章 先下手为强","chapnum":300,"status":2},{"chapter_id":6350912,"title":"第301章 走正门","chapnum":301,"status":2},{"chapter_id":6350922,"title":"第302章 包子捡软的捏","chapnum":302,"status":2},{"chapter_id":6350934,"title":"第303章 赔钱","chapnum":303,"status":2},{"chapter_id":6350949,"title":"第304章 前妻后妇","chapnum":304,"status":2},{"chapter_id":6350957,"title":"第305章 分家吧","chapnum":305,"status":2},{"chapter_id":6350973,"title":"第306章 周氏的主意","chapnum":306,"status":2},{"chapter_id":6350983,"title":"第307章 有用的男人","chapnum":307,"status":2},{"chapter_id":6350994,"title":"第308章 初入将军府","chapnum":308,"status":2},{"chapter_id":6351002,"title":"第309章 洪包氏","chapnum":309,"status":2},{"chapter_id":6351019,"title":"第310章 一纸婚书","chapnum":310,"status":2},{"chapter_id":6351034,"title":"第311章 有我在","chapnum":311,"status":2},{"chapter_id":6351045,"title":"第312章 不小心","chapnum":312,"status":2},{"chapter_id":6351057,"title":"第313章 害她们之人","chapnum":313,"status":2},{"chapter_id":6351065,"title":"第314章 当面讨论","chapnum":314,"status":2},{"chapter_id":6351082,"title":"第315章 她死了","chapnum":315,"status":2},{"chapter_id":6351089,"title":"第316章 财帛动人心","chapnum":316,"status":2},{"chapter_id":6351100,"title":"第317章 楚氏现状","chapnum":317,"status":2},{"chapter_id":6351114,"title":"第318章 第一次喝酒","chapnum":318,"status":2},{"chapter_id":6351123,"title":"第319章 说什么","chapnum":319,"status":2},{"chapter_id":6351134,"title":"第320章 地主之谊","chapnum":320,"status":2},{"chapter_id":6351148,"title":"第321章 不怀好意","chapnum":321,"status":2},{"chapter_id":6351158,"title":"第322章 大乌龙","chapnum":322,"status":2},{"chapter_id":6351168,"title":"第323章 高人助阵","chapnum":323,"status":2},{"chapter_id":6351179,"title":"第324章 黑白颠倒","chapnum":324,"status":2},{"chapter_id":6351191,"title":"第325章 没良心","chapnum":325,"status":2},{"chapter_id":6351207,"title":"第326章 耐心用尽","chapnum":326,"status":2},{"chapter_id":6351219,"title":"第327章 演什么","chapnum":327,"status":2},{"chapter_id":6351234,"title":"第328章 一个说法","chapnum":328,"status":2},{"chapter_id":6351245,"title":"第329章 赏月","chapnum":329,"status":2},{"chapter_id":6351256,"title":"第330章 品茶","chapnum":330,"status":2},{"chapter_id":6351269,"title":"第331章 叠罗汉","chapnum":331,"status":2},{"chapter_id":6351274,"title":"第332章 和谁一起睡","chapnum":332,"status":2},{"chapter_id":6351286,"title":"第333章 有问题","chapnum":333,"status":2},{"chapter_id":6351294,"title":"第334章 不该吃的药","chapnum":334,"status":2},{"chapter_id":6351304,"title":"第335章 不是我的主意","chapnum":335,"status":2},{"chapter_id":6351317,"title":"第336章 口苦心更苦","chapnum":336,"status":2},{"chapter_id":6351328,"title":"第337章 变了的感情","chapnum":337,"status":2},{"chapter_id":6351336,"title":"第338章 你们在干什么","chapnum":338,"status":2},{"chapter_id":6351349,"title":"第339章 亲上了","chapnum":339,"status":2},{"chapter_id":6351367,"title":"第340章 我们家的","chapnum":340,"status":2},{"chapter_id":6351382,"title":"第341章 被撞破","chapnum":341,"status":2},{"chapter_id":6351393,"title":"第342章 我饿了","chapnum":342,"status":2},{"chapter_id":6351403,"title":"第343章 含血喷人","chapnum":343,"status":2},{"chapter_id":6351413,"title":"第344章 不分香臭","chapnum":344,"status":2},{"chapter_id":6351419,"title":"第345章 很多人看到了","chapnum":345,"status":2},{"chapter_id":6351426,"title":"第346章 分辩","chapnum":346,"status":2},{"chapter_id":6351434,"title":"第347章 赏罚","chapnum":347,"status":2},{"chapter_id":6351443,"title":"第348章 兰儿的话","chapnum":348,"status":2},{"chapter_id":6351453,"title":"第349章 绝望","chapnum":349,"status":2},{"chapter_id":6351467,"title":"第350章 迟到的真相","chapnum":350,"status":2},{"chapter_id":6351477,"title":"第351章 险恶用心","chapnum":351,"status":2},{"chapter_id":6351491,"title":"第352章 彻底死心","chapnum":352,"status":2},{"chapter_id":6351502,"title":"第353章 你们都不是好人","chapnum":353,"status":2},{"chapter_id":6351516,"title":"第354章 有一就有二","chapnum":354,"status":2},{"chapter_id":6351526,"title":"第355章 一妻一妾","chapnum":355,"status":2},{"chapter_id":6351535,"title":"第356章 一家人","chapnum":356,"status":2},{"chapter_id":6351542,"title":"第357章 一个交待","chapnum":357,"status":2},{"chapter_id":6351553,"title":"第358章 去谈谈","chapnum":358,"status":2},{"chapter_id":6351562,"title":"第359章 三月内成亲","chapnum":359,"status":2},{"chapter_id":6351570,"title":"第360章 哥不敢啊","chapnum":360,"status":2},{"chapter_id":6351581,"title":"第361章 路府侍妾","chapnum":361,"status":2},{"chapter_id":6351590,"title":"第362章 女红的重要性","chapnum":362,"status":2},{"chapter_id":6351601,"title":"第363章 是个好姑娘","chapnum":363,"status":2},{"chapter_id":6351613,"title":"第364章 我想去","chapnum":364,"status":2},{"chapter_id":6351627,"title":"第365章 一顿饭","chapnum":365,"status":2},{"chapter_id":6351637,"title":"第366章  出事了","chapnum":366,"status":2},{"chapter_id":6351653,"title":"第367章 父亲","chapnum":367,"status":2},{"chapter_id":6351664,"title":"第368章 玩什么","chapnum":368,"status":2},{"chapter_id":6351675,"title":"第369章 我同情他","chapnum":369,"status":2},{"chapter_id":6351689,"title":"第370章 路家的女儿","chapnum":370,"status":2},{"chapter_id":6351698,"title":"第371章 防无可防","chapnum":371,"status":2},{"chapter_id":6351708,"title":"第372章 服一个理字","chapnum":372,"status":2},{"chapter_id":6351715,"title":"第373章 慈母多败儿","chapnum":373,"status":2},{"chapter_id":6351725,"title":"第374章 太敏感了","chapnum":374,"status":2},{"chapter_id":6351739,"title":"第375章 见皇帝","chapnum":375,"status":2},{"chapter_id":6351750,"title":"第376章 恩典","chapnum":376,"status":2},{"chapter_id":6351758,"title":"第377章 明君不好做","chapnum":377,"status":2},{"chapter_id":6351772,"title":"第378章 祖训","chapnum":378,"status":2},{"chapter_id":6351784,"title":"第379章 朕想做昏君","chapnum":379,"status":2},{"chapter_id":6351795,"title":"第380章 主意不变","chapnum":380,"status":2},{"chapter_id":6351806,"title":"第381章 乱点鸳鸯谱","chapnum":381,"status":2},{"chapter_id":6351820,"title":"第382章 陪你们玩","chapnum":382,"status":2},{"chapter_id":6351833,"title":"第383章 谈亲事","chapnum":383,"status":2},{"chapter_id":6351838,"title":"第384章 自求多福","chapnum":384,"status":2},{"chapter_id":6351857,"title":"第385章 一会儿再来","chapnum":385,"status":2},{"chapter_id":6351862,"title":"第386章 更吓人","chapnum":386,"status":2},{"chapter_id":6351877,"title":"第387章 王爷的教导","chapnum":387,"status":2},{"chapter_id":6351889,"title":"第388章 巧遇，说理","chapnum":388,"status":2},{"chapter_id":6351904,"title":"第389章 杀人的罪名","chapnum":389,"status":2},{"chapter_id":6351913,"title":"第390章 气不死你","chapnum":390,"status":2},{"chapter_id":6351923,"title":"第391章 给本王打","chapnum":391,"status":2},{"chapter_id":6351934,"title":"第392章 叶家的高人","chapnum":392,"status":2},{"chapter_id":6351943,"title":"第393章 居然是他","chapnum":393,"status":2},{"chapter_id":6351953,"title":"第394章 咱俩不熟","chapnum":394,"status":2},{"chapter_id":6351963,"title":"第395章 大礼","chapnum":395,"status":2},{"chapter_id":6351971,"title":"第396章 双喜临门","chapnum":396,"status":2},{"chapter_id":6351978,"title":"第397章 不是一路人","chapnum":397,"status":2},{"chapter_id":6351992,"title":"第398章 我们，和离","chapnum":398,"status":2},{"chapter_id":6351999,"title":"第399章 赔我一个夫人","chapnum":399,"status":2},{"chapter_id":6352009,"title":"第400章 用她为饵","chapnum":400,"status":2},{"chapter_id":6352017,"title":"第401章 与她何干","chapnum":401,"status":2},{"chapter_id":6352026,"title":"第402章 疯了","chapnum":402,"status":2},{"chapter_id":6352038,"title":"第403章 叶家完了","chapnum":403,"status":2},{"chapter_id":6352045,"title":"第404章 不用担心","chapnum":404,"status":2},{"chapter_id":6352052,"title":"第405章 多了个皇兄","chapnum":405,"status":2},{"chapter_id":6352062,"title":"第406章 功成身退","chapnum":406,"status":2},{"chapter_id":6352072,"title":"第407章 在边关","chapnum":407,"status":2},{"chapter_id":6352082,"title":"第408章 英雄美人 　（大结局）","chapnum":408,"status":2}]}}
+用例测试结果:   t_009----&gt;pass
+检查点-&gt;："data":
+返回实际结果-&gt;：{"status":true,"data":{"list":[{"chapter_id":6347560,"title":"第1章初到","chapnum":1,"status":2},{"chapter_id":6347570,"title":"第2章不正常","chapnum":2,"status":2},{"chapter_id":6347589,"title":"第3章接你回家","chapnum":3,"status":2},{"chapter_id":6347599,"title":"第4章嘱咐","chapnum":4,"status":2},{"chapter_id":6347609,"title":"第5章试探","chapnum":5,"status":2},{"chapter_id":6347620,"title":"第6章男女有别","chapnum":6,"status":2},{"chapter_id":6347631,"title":"第7章我，走了","chapnum":7,"status":2},{"chapter_id":6347639,"title":"第8章进府","chapnum":8,"status":2},{"chapter_id":6347651,"title":"第9章叶家老祖","chapnum":9,"status":2},{"chapter_id":6347663,"title":"第10章终相见","chapnum":10,"status":2},{"chapter_id":6347673,"title":"第11章 父女初对话","chapnum":11,"status":2},{"chapter_id":6347682,"title":"第12章 老嬷嬷","chapnum":12,"status":2},{"chapter_id":6347690,"title":"第13章 倒打一耙","chapnum":13,"status":2},{"chapter_id":6347707,"title":"第14章 闹开了","chapnum":14,"status":2},{"chapter_id":6347718,"title":"第15章 我要回家","chapnum":15,"status":2},{"chapter_id":6347730,"title":"第16章 都来了","chapnum":16,"status":2},{"chapter_id":6347741,"title":"第17章 要银子","chapnum":17,"status":2},{"chapter_id":6347749,"title":"第18章 没好人","chapnum":18,"status":2},{"chapter_id":6347762,"title":"第19章 财迷样","chapnum":19,"status":2},{"chapter_id":6347777,"title":"第20章 心思","chapnum":20,"status":2},{"chapter_id":6347787,"title":"第21章 丢东西了","chapnum":21,"status":2},{"chapter_id":6347800,"title":"第22章  我自有娘亲","chapnum":22,"status":2},{"chapter_id":6347812,"title":"第23章 算计女儿的父亲","chapnum":23,"status":2},{"chapter_id":6347824,"title":"第24章 自己选","chapnum":24,"status":2},{"chapter_id":6347835,"title":"第25章 够狠","chapnum":25,"status":2},{"chapter_id":6347849,"title":"第26章 拆台","chapnum":26,"status":2},{"chapter_id":6347857,"title":"第27章  二楞子","chapnum":27,"status":2},{"chapter_id":6347871,"title":"第28章 动口不动手","chapnum":28,"status":2},{"chapter_id":6347882,"title":"第29章 战斗力","chapnum":29,"status":2},{"chapter_id":6347890,"title":"第30章 他来了","chapnum":30,"status":2},{"chapter_id":6347905,"title":"第31章 玉恒公子","chapnum":31,"status":2},{"chapter_id":6347910,"title":"第32章  叶家姑娘","chapnum":32,"status":2},{"chapter_id":6347921,"title":"第33章 玉脂膏","chapnum":33,"status":2},{"chapter_id":6347932,"title":"第34章  生存法则","chapnum":34,"status":2},{"chapter_id":6347944,"title":"第35章 突如其来的陷害","chapnum":35,"status":2},{"chapter_id":6347954,"title":"第36章 学规矩","chapnum":36,"status":2},{"chapter_id":6347965,"title":"第37章 出贼了","chapnum":37,"status":2},{"chapter_id":6347974,"title":"第38章 老太爷到","chapnum":38,"status":2},{"chapter_id":6347985,"title":"第39章 怪现象","chapnum":39,"status":2},{"chapter_id":6347996,"title":"第40章 凭证","chapnum":40,"status":2},{"chapter_id":6348005,"title":"第41章 我的玉","chapnum":41,"status":2},{"chapter_id":6348016,"title":"第42章 都叫来","chapnum":42,"status":2},{"chapter_id":6348025,"title":"第43章 打起来了","chapnum":43,"status":2},{"chapter_id":6348035,"title":"第44章  我来治","chapnum":44,"status":2},{"chapter_id":6348045,"title":"第45章 是真晕","chapnum":45,"status":2},{"chapter_id":6348054,"title":"第46章 坑娘的娃","chapnum":46,"status":2},{"chapter_id":6348065,"title":"第47章 套话","chapnum":47,"status":2},{"chapter_id":6348080,"title":"第48章 老太爷怒","chapnum":48,"status":2},{"chapter_id":6348088,"title":"第49章 出气筒","chapnum":49,"status":2},{"chapter_id":6348102,"title":"第50章 讲道理","chapnum":50,"status":2},{"chapter_id":6348113,"title":"第51章 加把火","chapnum":51,"status":2},{"chapter_id":6348120,"title":"第52章 雷声大雨点小","chapnum":52,"status":2},{"chapter_id":6348132,"title":"第53章 处罚","chapnum":53,"status":2},{"chapter_id":6348141,"title":"第54章 一家人","chapnum":54,"status":2},{"chapter_id":6348153,"title":"第55章 落井下石","chapnum":55,"status":2},{"chapter_id":6348165,"title":"第56章 一唱一和","chapnum":56,"status":2},{"chapter_id":6348179,"title":"第57章 大实话","chapnum":57,"status":2},{"chapter_id":6348190,"title":"第58章 撒气","chapnum":58,"status":2},{"chapter_id":6348204,"title":"第59章 孝大于天","chapnum":59,"status":2},{"chapter_id":6348213,"title":"第60章 生养之恩","chapnum":60,"status":2},{"chapter_id":6348223,"title":"第61章 仁至义尽","chapnum":61,"status":2},{"chapter_id":6348235,"title":"第62章 一起忍","chapnum":62,"status":2},{"chapter_id":6348250,"title":"第63章 恶女人","chapnum":63,"status":2},{"chapter_id":6348261,"title":"第64章 你姓吕","chapnum":64,"status":2},{"chapter_id":6348275,"title":"第65章 碎了","chapnum":65,"status":2},{"chapter_id":6348285,"title":"第66章 都晕了","chapnum":66,"status":2},{"chapter_id":6348295,"title":"第67章 大闹","chapnum":67,"status":2},{"chapter_id":6348306,"title":"第68章 赶人","chapnum":68,"status":2},{"chapter_id":6348322,"title":"第69章 好算盘","chapnum":69,"status":2},{"chapter_id":6348335,"title":"第70章 重点","chapnum":70,"status":2},{"chapter_id":6348344,"title":"第71章 家信","chapnum":71,"status":2},{"chapter_id":6348354,"title":"第72章 什么事","chapnum":72,"status":2},{"chapter_id":6348365,"title":"第73章 夜半来客","chapnum":73,"status":2},{"chapter_id":6348376,"title":"第74章 又要算计","chapnum":74,"status":2},{"chapter_id":6348389,"title":"第75章 配合","chapnum":75,"status":2},{"chapter_id":6348397,"title":"第76章 被动","chapnum":76,"status":2},{"chapter_id":6348407,"title":"第77章 气醒了","chapnum":77,"status":2},{"chapter_id":6348417,"title":"第78章 照顾","chapnum":78,"status":2},{"chapter_id":6348430,"title":"第79章 小心被人听到","chapnum":79,"status":2},{"chapter_id":6348439,"title":"第80章 见外室","chapnum":80,"status":2},{"chapter_id":6348452,"title":"第81章 妻妾相见","chapnum":81,"status":2},{"chapter_id":6348466,"title":"第82章 漂亮反击","chapnum":82,"status":2},{"chapter_id":6348481,"title":"第83章 不同的方式","chapnum":83,"status":2},{"chapter_id":6348492,"title":"第84章 吓唬","chapnum":84,"status":2},{"chapter_id":6348502,"title":"第85章 态度强硬","chapnum":85,"status":2},{"chapter_id":6348513,"title":"第86章 大谎话","chapnum":86,"status":2},{"chapter_id":6348522,"title":"第87章 心火旺","chapnum":87,"status":2},{"chapter_id":6348531,"title":"第88章 请客","chapnum":88,"status":2},{"chapter_id":6348544,"title":"第89章 嫡庶之别","chapnum":89,"status":2},{"chapter_id":6348561,"title":"第90章 谋算","chapnum":90,"status":2},{"chapter_id":6348572,"title":"第91章 假的？","chapnum":91,"status":2},{"chapter_id":6348584,"title":"第92章 两不相帮","chapnum":92,"status":2},{"chapter_id":6348603,"title":"第93章 月色正好","chapnum":93,"status":2},{"chapter_id":6348611,"title":"第94章 私会","chapnum":94,"status":2},{"chapter_id":6348620,"title":"第95章 被发现了","chapnum":95,"status":2},{"chapter_id":6348631,"title":"第96章 书香门弟","chapnum":96,"status":2},{"chapter_id":6348641,"title":"第97章 傻女人","chapnum":97,"status":2},{"chapter_id":6348651,"title":"第98章 古怪","chapnum":98,"status":2},{"chapter_id":6348660,"title":"第99章 夫人病了","chapnum":99,"status":2},{"chapter_id":6348685,"title":"第100章 我来了","chapnum":100,"status":2},{"chapter_id":6348695,"title":"第101章 女肖父","chapnum":101,"status":2},{"chapter_id":6348708,"title":"第102章 拿刀来","chapnum":102,"status":2},{"chapter_id":6348722,"title":"第103章 真正的高人","chapnum":103,"status":2},{"chapter_id":6348737,"title":"第104章 罪名","chapnum":104,"status":2},{"chapter_id":6348754,"title":"第105章 借势","chapnum":105,"status":2},{"chapter_id":6348761,"title":"第106章 叫破与变脸","chapnum":106,"status":2},{"chapter_id":6348771,"title":"第107章 初次配合","chapnum":107,"status":2},{"chapter_id":6348788,"title":"第108章 一个理由","chapnum":108,"status":2},{"chapter_id":6348795,"title":"第109章 聪明的女人","chapnum":109,"status":2},{"chapter_id":6348804,"title":"第110章 叶家女儿","chapnum":110,"status":2},{"chapter_id":6348816,"title":"第111章 怒打白莲","chapnum":111,"status":2},{"chapter_id":6348824,"title":"第112章 别捂了","chapnum":112,"status":2},{"chapter_id":6348836,"title":"第113章 谁不知廉耻","chapnum":113,"status":2},{"chapter_id":6348847,"title":"第114章 得理不饶人","chapnum":114,"status":2},{"chapter_id":6348858,"title":"第115章 不干了","chapnum":115,"status":2},{"chapter_id":6348870,"title":"第116章 喜欢谁","chapnum":116,"status":2},{"chapter_id":6348876,"title":"第117章 丫鬟生涯","chapnum":117,"status":2},{"chapter_id":6348887,"title":"第118章 东风到","chapnum":118,"status":2},{"chapter_id":6348897,"title":"第119章 陪着你","chapnum":119,"status":2},{"chapter_id":6348908,"title":"第120章 说话厚道","chapnum":120,"status":2},{"chapter_id":6348922,"title":"第121章 老夫人有请","chapnum":121,"status":2},{"chapter_id":6348933,"title":"第122章 被告状","chapnum":122,"status":2},{"chapter_id":6348939,"title":"第123章 有规矩是好事","chapnum":123,"status":2},{"chapter_id":6348950,"title":"第124章 是谁？","chapnum":124,"status":2},{"chapter_id":6348963,"title":"第125章 走一遭","chapnum":125,"status":2},{"chapter_id":6348976,"title":"第126章 叶家门风","chapnum":126,"status":2},{"chapter_id":6348985,"title":"第127章 不管了","chapnum":127,"status":2},{"chapter_id":6348996,"title":"第128章 妻妾斗","chapnum":128,"status":2},{"chapter_id":6349005,"title":"第129章 屋子被搜","chapnum":129,"status":2},{"chapter_id":6349020,"title":"第130章 我来助你","chapnum":130,"status":2},{"chapter_id":6349030,"title":"第131章 步步紧逼","chapnum":131,"status":2},{"chapter_id":6349041,"title":"第132章 哑巴亏","chapnum":132,"status":2},{"chapter_id":6349053,"title":"第133章 又一个高手","chapnum":133,"status":2},{"chapter_id":6349064,"title":"第134章 又添人","chapnum":134,"status":2},{"chapter_id":6349078,"title":"第135章 到齐了","chapnum":135,"status":2},{"chapter_id":6349089,"title":"第136章 拒绝","chapnum":136,"status":2},{"chapter_id":6349102,"title":"第137章 主母的气势","chapnum":137,"status":2},{"chapter_id":6349117,"title":"第138章 混水才好摸鱼","chapnum":138,"status":2},{"chapter_id":6349128,"title":"第139章 有人来过","chapnum":139,"status":2},{"chapter_id":6349139,"title":"第140章 倚仗和钥匙","chapnum":140,"status":2},{"chapter_id":6349150,"title":"第141章  今日是东风","chapnum":141,"status":2},{"chapter_id":6349159,"title":"第142章 好计划","chapnum":142,"status":2},{"chapter_id":6349170,"title":"第143章 无事不登门","chapnum":143,"status":2},{"chapter_id":6349180,"title":"第144章 劝","chapnum":144,"status":2},{"chapter_id":6349190,"title":"第145章 有难度","chapnum":145,"status":2},{"chapter_id":6349198,"title":"第146章 一起走","chapnum":146,"status":2},{"chapter_id":6349210,"title":"第147章 邀请","chapnum":147,"status":2},{"chapter_id":6349222,"title":"第148章 吕焕的主意","chapnum":148,"status":2},{"chapter_id":6349231,"title":"第149章 打渣男","chapnum":149,"status":2},{"chapter_id":6349242,"title":"第150章 找上门","chapnum":150,"status":2},{"chapter_id":6349254,"title":"第151章 讲道理","chapnum":151,"status":2},{"chapter_id":6349267,"title":"第152章 吕焕的下场","chapnum":152,"status":2},{"chapter_id":6349278,"title":"第153章 完美解决","chapnum":153,"status":2},{"chapter_id":6349291,"title":"第154章 诚意","chapnum":154,"status":2},{"chapter_id":6349300,"title":"第155章 牢不可破的交情","chapnum":155,"status":2},{"chapter_id":6349312,"title":"第156 不见了","chapnum":156,"status":2},{"chapter_id":6349328,"title":"第157章 后果","chapnum":157,"status":2},{"chapter_id":6349342,"title":"第158章 门口动手","chapnum":158,"status":2},{"chapter_id":6349353,"title":"第159章 再合作","chapnum":159,"status":2},{"chapter_id":6349365,"title":"第160章 四姑母打我","chapnum":160,"status":2},{"chapter_id":6349373,"title":"第161章 一家之主","chapnum":161,"status":2},{"chapter_id":6349386,"title":"第162章 无耻之极","chapnum":162,"status":2},{"chapter_id":6349398,"title":"第163章 威胁","chapnum":163,"status":2},{"chapter_id":6349408,"title":"第164章 都是可怜人","chapnum":164,"status":2},{"chapter_id":6349418,"title":"第165章 撕破脸","chapnum":165,"status":2},{"chapter_id":6349430,"title":"第166章 故意的","chapnum":166,"status":2},{"chapter_id":6349435,"title":"第167章 男人啊男人","chapnum":167,"status":2},{"chapter_id":6349444,"title":"第168章 处罚谁","chapnum":168,"status":2},{"chapter_id":6349461,"title":"第169章 还在算计","chapnum":169,"status":2},{"chapter_id":6349471,"title":"第170章 只要儿子","chapnum":170,"status":2},{"chapter_id":6349483,"title":"第171章 不放","chapnum":171,"status":2},{"chapter_id":6349495,"title":"第172章 你们都要走","chapnum":172,"status":2},{"chapter_id":6349507,"title":"第173章 为自己打算","chapnum":173,"status":2},{"chapter_id":6349522,"title":"第174章 笨女儿","chapnum":174,"status":2},{"chapter_id":6349530,"title":"第175章 后宅事","chapnum":175,"status":2},{"chapter_id":6349538,"title":"第176章 周府的怒火","chapnum":176,"status":2},{"chapter_id":6349546,"title":"第177章 周家夫人","chapnum":177,"status":2},{"chapter_id":6349559,"title":"第178章 赔礼来了","chapnum":178,"status":2},{"chapter_id":6349572,"title":"第179章 二夫人发威","chapnum":179,"status":2},{"chapter_id":6349581,"title":"第180章 您多担待","chapnum":180,"status":2},{"chapter_id":6349593,"title":"第181章 吐真言","chapnum":181,"status":2},{"chapter_id":6349605,"title":"第182章 疯了","chapnum":182,"status":2},{"chapter_id":6349615,"title":"第183章 思念","chapnum":183,"status":2},{"chapter_id":6349625,"title":"第184章 树大，招风 ","chapnum":184,"status":2},{"chapter_id":6349638,"title":"第185章 舅父请罪","chapnum":185,"status":2},{"chapter_id":6349649,"title":"第186章 周家的男人","chapnum":186,"status":2},{"chapter_id":6349656,"title":"第187章 定住了眼","chapnum":187,"status":2},{"chapter_id":6349667,"title":"第188章 听墙角","chapnum":188,"status":2},{"chapter_id":6349684,"title":"第189章 表哥的心思","chapnum":189,"status":2},{"chapter_id":6349695,"title":"第190章 吓了一跳","chapnum":190,"status":2},{"chapter_id":6349704,"title":"第191章 怎么见面 ","chapnum":191,"status":2},{"chapter_id":6349715,"title":"第192章 又一个弟弟","chapnum":192,"status":2},{"chapter_id":6349728,"title":"第193章 立威","chapnum":193,"status":2},{"chapter_id":6349741,"title":"第194章 帮忙","chapnum":194,"status":2},{"chapter_id":6349752,"title":"第195章 劝架方式","chapnum":195,"status":2},{"chapter_id":6349764,"title":"第196章 别的心思","chapnum":196,"status":2},{"chapter_id":6349773,"title":"第197章 都是狼","chapnum":197,"status":2},{"chapter_id":6349783,"title":"第198章 豁出去了","chapnum":198,"status":2},{"chapter_id":6349799,"title":"第199章  一个耳光","chapnum":199,"status":2},{"chapter_id":6349812,"title":"第200章 凉薄的亲情","chapnum":200,"status":2},{"chapter_id":6349825,"title":"第201章 好多同行","chapnum":201,"status":2},{"chapter_id":6349840,"title":"第202章 撬开她的嘴","chapnum":202,"status":2},{"chapter_id":6349852,"title":"第203章 丢尽脸面","chapnum":203,"status":2},{"chapter_id":6349863,"title":"第204章 毒菇出现","chapnum":204,"status":2},{"chapter_id":6349873,"title":"第205章 审姨娘","chapnum":205,"status":2},{"chapter_id":6349884,"title":"第206章 又脏又乱","chapnum":206,"status":2},{"chapter_id":6349895,"title":"第207章 狮子大开口","chapnum":207,"status":2},{"chapter_id":6349907,"title":"第208章 奴告主","chapnum":208,"status":2},{"chapter_id":6349915,"title":"第209章 着急","chapnum":209,"status":2},{"chapter_id":6349923,"title":"第210章 全是烦心事","chapnum":210,"status":2},{"chapter_id":6349932,"title":"第211章 倒打一耙","chapnum":211,"status":2},{"chapter_id":6349943,"title":"第212章 你是什么意思？","chapnum":212,"status":2},{"chapter_id":6349952,"title":"第213章 谁理亏","chapnum":213,"status":2},{"chapter_id":6349967,"title":"第214章 两件事","chapnum":214,"status":2},{"chapter_id":6349980,"title":"第215章 说服","chapnum":215,"status":2},{"chapter_id":6349990,"title":"第216章 老夫人有请","chapnum":216,"status":2},{"chapter_id":6350002,"title":"第217章 算计他","chapnum":217,"status":2},{"chapter_id":6350013,"title":"第218章 忍无可忍","chapnum":218,"status":2},{"chapter_id":6350030,"title":"第219章 落套","chapnum":219,"status":2},{"chapter_id":6350039,"title":"第220章 谣言害人","chapnum":220,"status":2},{"chapter_id":6350054,"title":"第221章 一条帕子","chapnum":221,"status":2},{"chapter_id":6350066,"title":"第222章 大闹","chapnum":222,"status":2},{"chapter_id":6350077,"title":"第223章 一言定终生","chapnum":223,"status":2},{"chapter_id":6350091,"title":"第224章 说说你的事","chapnum":224,"status":2},{"chapter_id":6350106,"title":"第225章 大尾巴狼","chapnum":225,"status":2},{"chapter_id":6350120,"title":"第226章 我来说","chapnum":226,"status":2},{"chapter_id":6350124,"title":"第227章 不合时宜的话","chapnum":227,"status":2},{"chapter_id":6350134,"title":"第228章 女人打架","chapnum":228,"status":2},{"chapter_id":6350145,"title":"第229章 自保","chapnum":229,"status":2},{"chapter_id":6350157,"title":"第230章 二房的算计","chapnum":230,"status":2},{"chapter_id":6350168,"title":"第231章 都给他","chapnum":231,"status":2},{"chapter_id":6350174,"title":"第232章 做了一回自己","chapnum":232,"status":2},{"chapter_id":6350191,"title":"第233章 都是钱惹的祸","chapnum":233,"status":2},{"chapter_id":6350201,"title":"第234章 清明的老祖宗","chapnum":234,"status":2},{"chapter_id":6350214,"title":"第235章 打算出叶府","chapnum":235,"status":2},{"chapter_id":6350226,"title":"第236章 早就写好的信","chapnum":236,"status":2},{"chapter_id":6350237,"title":"第237章 怒火","chapnum":237,"status":2},{"chapter_id":6350249,"title":"第238章 我疯了","chapnum":238,"status":2},{"chapter_id":6350261,"title":"第239章 砸东西","chapnum":239,"status":2},{"chapter_id":6350273,"title":"第240章 彻底爆发","chapnum":240,"status":2},{"chapter_id":6350284,"title":"第241章 包氏失踪","chapnum":241,"status":2},{"chapter_id":6350296,"title":"第242章 明天，认祖","chapnum":242,"status":2},{"chapter_id":6350305,"title":"第243章 论事","chapnum":243,"status":2},{"chapter_id":6350313,"title":"第244章 祸害遗千年","chapnum":244,"status":2},{"chapter_id":6350324,"title":"第245章 把柄","chapnum":245,"status":2},{"chapter_id":6350336,"title":"第246章 没有家","chapnum":246,"status":2},{"chapter_id":6350349,"title":"第247章 眼皮子浅","chapnum":247,"status":2},{"chapter_id":6350358,"title":"第248章 叶家的女人","chapnum":248,"status":2},{"chapter_id":6350367,"title":"第249章 九妹报信","chapnum":249,"status":2},{"chapter_id":6350378,"title":"第250章 有内鬼","chapnum":250,"status":2},{"chapter_id":6350389,"title":"第251章 被坑了","chapnum":251,"status":2},{"chapter_id":6350398,"title":"第252章 男女之分","chapnum":252,"status":2},{"chapter_id":6350405,"title":"第253章 表妹出场","chapnum":253,"status":2},{"chapter_id":6350417,"title":"第254章 与我何干","chapnum":254,"status":2},{"chapter_id":6350426,"title":"第255章 寻死","chapnum":255,"status":2},{"chapter_id":6350435,"title":"第256章 又来一个","chapnum":256,"status":2},{"chapter_id":6350447,"title":"第257章 说得好","chapnum":257,"status":2},{"chapter_id":6350454,"title":"第258章 不用留面子","chapnum":258,"status":2},{"chapter_id":6350463,"title":"第259章 事发","chapnum":259,"status":2},{"chapter_id":6350477,"title":"第260章 怎么补救","chapnum":260,"status":2},{"chapter_id":6350485,"title":"第261章 滚进来","chapnum":261,"status":2},{"chapter_id":6350495,"title":"第262章 姐弟","chapnum":262,"status":2},{"chapter_id":6350504,"title":"第263章 老实人的话","chapnum":263,"status":2},{"chapter_id":6350521,"title":"第264章 几个媳妇","chapnum":264,"status":2},{"chapter_id":6350526,"title":"第265章 嚣张的奴才","chapnum":265,"status":2},{"chapter_id":6350542,"title":"第266章 私相授受","chapnum":266,"status":2},{"chapter_id":6350548,"title":"第267章 你不配","chapnum":267,"status":2},{"chapter_id":6350560,"title":"第268章 逼问","chapnum":268,"status":2},{"chapter_id":6350571,"title":"第269章 不合时宜的教导","chapnum":269,"status":2},{"chapter_id":6350583,"title":"第270章 眼前报","chapnum":270,"status":2},{"chapter_id":6350589,"title":"第271章 先拿钱","chapnum":271,"status":2},{"chapter_id":6350602,"title":"第272章 他说谎","chapnum":272,"status":2},{"chapter_id":6350615,"title":"第273章 坏人的维护","chapnum":273,"status":2},{"chapter_id":6350622,"title":"第274章 一份子","chapnum":274,"status":2},{"chapter_id":6350633,"title":"第275章 乱成一团","chapnum":275,"status":2},{"chapter_id":6350643,"title":"第276章 算旧帐","chapnum":276,"status":2},{"chapter_id":6350660,"title":"第277章 左拥右抱","chapnum":277,"status":2},{"chapter_id":6350668,"title":"第278章 几件事","chapnum":278,"status":2},{"chapter_id":6350679,"title":"第279章 你猜","chapnum":279,"status":2},{"chapter_id":6350690,"title":"第280章 惊天秘密","chapnum":280,"status":2},{"chapter_id":6350700,"title":"第281章 是谁","chapnum":281,"status":2},{"chapter_id":6350712,"title":"第282章 不是他","chapnum":282,"status":2},{"chapter_id":6350720,"title":"第283章 你可真恨他","chapnum":283,"status":2},{"chapter_id":6350730,"title":"第284章 搅混水","chapnum":284,"status":2},{"chapter_id":6350741,"title":"第285章 你可以不听","chapnum":285,"status":2},{"chapter_id":6350751,"title":"第286章 叶氏族长","chapnum":286,"status":2},{"chapter_id":6350759,"title":"第287章 说漏嘴了","chapnum":287,"status":2},{"chapter_id":6350770,"title":"第288章 我先走了","chapnum":288,"status":2},{"chapter_id":6350779,"title":"第289章  又来坑人","chapnum":289,"status":2},{"chapter_id":6350793,"title":"第290章 几位贵妾","chapnum":290,"status":2},{"chapter_id":6350802,"title":"第291章 和我无关 ","chapnum":291,"status":2},{"chapter_id":6350816,"title":"第292章 夫妻大闹","chapnum":292,"status":2},{"chapter_id":6350827,"title":"第293章 新消息","chapnum":293,"status":2},{"chapter_id":6350838,"title":"第294章 有目的的兰儿","chapnum":294,"status":2},{"chapter_id":6350849,"title":"第295章 故意请教","chapnum":295,"status":2},{"chapter_id":6350856,"title":"第296章 我就是传话的","chapnum":296,"status":2},{"chapter_id":6350869,"title":"第297章 娘亲出现","chapnum":297,"status":2},{"chapter_id":6350880,"title":"第298章 娘要嫁人","chapnum":298,"status":2},{"chapter_id":6350891,"title":"第299章 我同意","chapnum":299,"status":2},{"chapter_id":6350903,"title":"第300章 先下手为强","chapnum":300,"status":2},{"chapter_id":6350912,"title":"第301章 走正门","chapnum":301,"status":2},{"chapter_id":6350922,"title":"第302章 包子捡软的捏","chapnum":302,"status":2},{"chapter_id":6350934,"title":"第303章 赔钱","chapnum":303,"status":2},{"chapter_id":6350949,"title":"第304章 前妻后妇","chapnum":304,"status":2},{"chapter_id":6350957,"title":"第305章 分家吧","chapnum":305,"status":2},{"chapter_id":6350973,"title":"第306章 周氏的主意","chapnum":306,"status":2},{"chapter_id":6350983,"title":"第307章 有用的男人","chapnum":307,"status":2},{"chapter_id":6350994,"title":"第308章 初入将军府","chapnum":308,"status":2},{"chapter_id":6351002,"title":"第309章 洪包氏","chapnum":309,"status":2},{"chapter_id":6351019,"title":"第310章 一纸婚书","chapnum":310,"status":2},{"chapter_id":6351034,"title":"第311章 有我在","chapnum":311,"status":2},{"chapter_id":6351045,"title":"第312章 不小心","chapnum":312,"status":2},{"chapter_id":6351057,"title":"第313章 害她们之人","chapnum":313,"status":2},{"chapter_id":6351065,"title":"第314章 当面讨论","chapnum":314,"status":2},{"chapter_id":6351082,"title":"第315章 她死了","chapnum":315,"status":2},{"chapter_id":6351089,"title":"第316章 财帛动人心","chapnum":316,"status":2},{"chapter_id":6351100,"title":"第317章 楚氏现状","chapnum":317,"status":2},{"chapter_id":6351114,"title":"第318章 第一次喝酒","chapnum":318,"status":2},{"chapter_id":6351123,"title":"第319章 说什么","chapnum":319,"status":2},{"chapter_id":6351134,"title":"第320章 地主之谊","chapnum":320,"status":2},{"chapter_id":6351148,"title":"第321章 不怀好意","chapnum":321,"status":2},{"chapter_id":6351158,"title":"第322章 大乌龙","chapnum":322,"status":2},{"chapter_id":6351168,"title":"第323章 高人助阵","chapnum":323,"status":2},{"chapter_id":6351179,"title":"第324章 黑白颠倒","chapnum":324,"status":2},{"chapter_id":6351191,"title":"第325章 没良心","chapnum":325,"status":2},{"chapter_id":6351207,"title":"第326章 耐心用尽","chapnum":326,"status":2},{"chapter_id":6351219,"title":"第327章 演什么","chapnum":327,"status":2},{"chapter_id":6351234,"title":"第328章 一个说法","chapnum":328,"status":2},{"chapter_id":6351245,"title":"第329章 赏月","chapnum":329,"status":2},{"chapter_id":6351256,"title":"第330章 品茶","chapnum":330,"status":2},{"chapter_id":6351269,"title":"第331章 叠罗汉","chapnum":331,"status":2},{"chapter_id":6351274,"title":"第332章 和谁一起睡","chapnum":332,"status":2},{"chapter_id":6351286,"title":"第333章 有问题","chapnum":333,"status":2},{"chapter_id":6351294,"title":"第334章 不该吃的药","chapnum":334,"status":2},{"chapter_id":6351304,"title":"第335章 不是我的主意","chapnum":335,"status":2},{"chapter_id":6351317,"title":"第336章 口苦心更苦","chapnum":336,"status":2},{"chapter_id":6351328,"title":"第337章 变了的感情","chapnum":337,"status":2},{"chapter_id":6351336,"title":"第338章 你们在干什么","chapnum":338,"status":2},{"chapter_id":6351349,"title":"第339章 亲上了","chapnum":339,"status":2},{"chapter_id":6351367,"title":"第340章 我们家的","chapnum":340,"status":2},{"chapter_id":6351382,"title":"第341章 被撞破","chapnum":341,"status":2},{"chapter_id":6351393,"title":"第342章 我饿了","chapnum":342,"status":2},{"chapter_id":6351403,"title":"第343章 含血喷人","chapnum":343,"status":2},{"chapter_id":6351413,"title":"第344章 不分香臭","chapnum":344,"status":2},{"chapter_id":6351419,"title":"第345章 很多人看到了","chapnum":345,"status":2},{"chapter_id":6351426,"title":"第346章 分辩","chapnum":346,"status":2},{"chapter_id":6351434,"title":"第347章 赏罚","chapnum":347,"status":2},{"chapter_id":6351443,"title":"第348章 兰儿的话","chapnum":348,"status":2},{"chapter_id":6351453,"title":"第349章 绝望","chapnum":349,"status":2},{"chapter_id":6351467,"title":"第350章 迟到的真相","chapnum":350,"status":2},{"chapter_id":6351477,"title":"第351章 险恶用心","chapnum":351,"status":2},{"chapter_id":6351491,"title":"第352章 彻底死心","chapnum":352,"status":2},{"chapter_id":6351502,"title":"第353章 你们都不是好人","chapnum":353,"status":2},{"chapter_id":6351516,"title":"第354章 有一就有二","chapnum":354,"status":2},{"chapter_id":6351526,"title":"第355章 一妻一妾","chapnum":355,"status":2},{"chapter_id":6351535,"title":"第356章 一家人","chapnum":356,"status":2},{"chapter_id":6351542,"title":"第357章 一个交待","chapnum":357,"status":2},{"chapter_id":6351553,"title":"第358章 去谈谈","chapnum":358,"status":2},{"chapter_id":6351562,"title":"第359章 三月内成亲","chapnum":359,"status":2},{"chapter_id":6351570,"title":"第360章 哥不敢啊","chapnum":360,"status":2},{"chapter_id":6351581,"title":"第361章 路府侍妾","chapnum":361,"status":2},{"chapter_id":6351590,"title":"第362章 女红的重要性","chapnum":362,"status":2},{"chapter_id":6351601,"title":"第363章 是个好姑娘","chapnum":363,"status":2},{"chapter_id":6351613,"title":"第364章 我想去","chapnum":364,"status":2},{"chapter_id":6351627,"title":"第365章 一顿饭","chapnum":365,"status":2},{"chapter_id":6351637,"title":"第366章  出事了","chapnum":366,"status":2},{"chapter_id":6351653,"title":"第367章 父亲","chapnum":367,"status":2},{"chapter_id":6351664,"title":"第368章 玩什么","chapnum":368,"status":2},{"chapter_id":6351675,"title":"第369章 我同情他","chapnum":369,"status":2},{"chapter_id":6351689,"title":"第370章 路家的女儿","chapnum":370,"status":2},{"chapter_id":6351698,"title":"第371章 防无可防","chapnum":371,"status":2},{"chapter_id":6351708,"title":"第372章 服一个理字","chapnum":372,"status":2},{"chapter_id":6351715,"title":"第373章 慈母多败儿","chapnum":373,"status":2},{"chapter_id":6351725,"title":"第374章 太敏感了","chapnum":374,"status":2},{"chapter_id":6351739,"title":"第375章 见皇帝","chapnum":375,"status":2},{"chapter_id":6351750,"title":"第376章 恩典","chapnum":376,"status":2},{"chapter_id":6351758,"title":"第377章 明君不好做","chapnum":377,"status":2},{"chapter_id":6351772,"title":"第378章 祖训","chapnum":378,"status":2},{"chapter_id":6351784,"title":"第379章 朕想做昏君","chapnum":379,"status":2},{"chapter_id":6351795,"title":"第380章 主意不变","chapnum":380,"status":2},{"chapter_id":6351806,"title":"第381章 乱点鸳鸯谱","chapnum":381,"status":2},{"chapter_id":6351820,"title":"第382章 陪你们玩","chapnum":382,"status":2},{"chapter_id":6351833,"title":"第383章 谈亲事","chapnum":383,"status":2},{"chapter_id":6351838,"title":"第384章 自求多福","chapnum":384,"status":2},{"chapter_id":6351857,"title":"第385章 一会儿再来","chapnum":385,"status":2},{"chapter_id":6351862,"title":"第386章 更吓人","chapnum":386,"status":2},{"chapter_id":6351877,"title":"第387章 王爷的教导","chapnum":387,"status":2},{"chapter_id":6351889,"title":"第388章 巧遇，说理","chapnum":388,"status":2},{"chapter_id":6351904,"title":"第389章 杀人的罪名","chapnum":389,"status":2},{"chapter_id":6351913,"title":"第390章 气不死你","chapnum":390,"status":2},{"chapter_id":6351923,"title":"第391章 给本王打","chapnum":391,"status":2},{"chapter_id":6351934,"title":"第392章 叶家的高人","chapnum":392,"status":2},{"chapter_id":6351943,"title":"第393章 居然是他","chapnum":393,"status":2},{"chapter_id":6351953,"title":"第394章 咱俩不熟","chapnum":394,"status":2},{"chapter_id":6351963,"title":"第395章 大礼","chapnum":395,"status":2},{"chapter_id":6351971,"title":"第396章 双喜临门","chapnum":396,"status":2},{"chapter_id":6351978,"title":"第397章 不是一路人","chapnum":397,"status":2},{"chapter_id":6351992,"title":"第398章 我们，和离","chapnum":398,"status":2},{"chapter_id":6351999,"title":"第399章 赔我一个夫人","chapnum":399,"status":2},{"chapter_id":6352009,"title":"第400章 用她为饵","chapnum":400,"status":2},{"chapter_id":6352017,"title":"第401章 与她何干","chapnum":401,"status":2},{"chapter_id":6352026,"title":"第402章 疯了","chapnum":402,"status":2},{"chapter_id":6352038,"title":"第403章 叶家完了","chapnum":403,"status":2},{"chapter_id":6352045,"title":"第404章 不用担心","chapnum":404,"status":2},{"chapter_id":6352052,"title":"第405章 多了个皇兄","chapnum":405,"status":2},{"chapter_id":6352062,"title":"第406章 功成身退","chapnum":406,"status":2},{"chapter_id":6352072,"title":"第407章 在边关","chapnum":407,"status":2},{"chapter_id":6352082,"title":"第408章 英雄美人 　（大结局）","chapnum":408,"status":2}]}}
+
+
+        </pre>
+    </div>
+    <!--css div popup end-->
+
+    </td>
+    <td></td>
+</tr>
+
+<tr id='pt1.9' class='hiddenRow'>
+    <td ><div class='testcase'>test_api_09</div></td>
+    <td colspan='5' align='center'>
+
+    <!--css div popup start-->
+    <span class='status passCase'>
+    <a class="popup_link" onfocus='this.blur();' href="javascript:showTestDetail('div_pt1.9')" >
+        通过</a></span>
+
+    <div id='div_pt1.9' class="popup_window">
+        <div style='text-align: right; color:red;cursor:pointer'>
+        <a onfocus='this.blur();' onclick="document.getElementById('div_pt1.9').style.display = 'none' " >
+           [x]</a>
+        </div>
+        <pre>
+        
+pt1.9: 请求头部：{'Content-Type': 'application/x-www-form-urlencoded'}
+*******正在执行用例：-----  t_010  ----**********
+请求方式：post, 请求url:http://apiprd.zhuishubao.com/appprogram/user-favorite-book/list2
+请求params：None
+post请求body类型为：data ,body内容为：{'device_id': '860604044727590', 'page': '1', 'nid': '7152', 'version': '2', 'pageSize': '20'}
+页面返回信息：{"status":true,"data":{"list":[{"id":2240294,"uidb":0,"deviceId":"860604044727590","token":"","nid":7152,"editorid":159}],"total":1,"total_page":0}}
+用例测试结果:   t_010----&gt;pass
+检查点-&gt;："data":
+返回实际结果-&gt;：{"status":true,"data":{"list":[{"id":2240294,"uidb":0,"deviceId":"860604044727590","token":"","nid":7152,"editorid":159}],"total":1,"total_page":0}}
+
+
+        </pre>
+    </div>
+    <!--css div popup end-->
+
+    </td>
+    <td></td>
+</tr>
+
+<tr id='pt1.10' class='hiddenRow'>
+    <td ><div class='testcase'>test_api_10</div></td>
+    <td colspan='5' align='center'>
+
+    <!--css div popup start-->
+    <span class='status passCase'>
+    <a class="popup_link" onfocus='this.blur();' href="javascript:showTestDetail('div_pt1.10')" >
+        通过</a></span>
+
+    <div id='div_pt1.10' class="popup_window">
+        <div style='text-align: right; color:red;cursor:pointer'>
+        <a onfocus='this.blur();' onclick="document.getElementById('div_pt1.10').style.display = 'none' " >
+           [x]</a>
+        </div>
+        <pre>
+        
+pt1.10: 请求头部：{'Content-Type': 'application/x-www-form-urlencoded'}
+*******正在执行用例：-----  t_011  ----**********
+请求方式：post, 请求url:http://apiprd.zhuishubao.com/appprogram/fiction/book-detail
+请求params：None
+post请求body类型为：data ,body内容为：{'id': '7152', 'version': '2', 'token': '', 'device_id': '860604044727590'}
+页面返回信息：{"status":true,"data":{"info":{"star":5,"nid":7152,"bookname":"天价萌宝：总裁爹地超给力","cover":"https://wnzsapp.oss-cn-shanghai.aliyuncs.com/uploads/novel/161916911617.jpg?x-oss-process=image/resize,m_mfit,h_256,w_192/format,webp","tag":"现代言情","author":"谨羽","editorid":"桃乐文学","brief":"“偷了我的基因想不认帐？”他逮住她，要她交出6年前生的宝宝。她死活不愿交出儿子，他只好纡尊降贵的对她死缠烂打，更是扬言要求同居。“爸爸，妈妈和别的叔叔跑了。”某宝告密。“派人给我追，绑回来家法伺候。”某男大怒。她只是和同事一块儿去出差，哪里是和别的男人跑路。于是，以后的每天某宝看到妈妈总是扶着墙下楼，然后爸爸笑的意犹未尽。","status":2,"update_status":0,"words_number":"142万字","chapter_name":"第672章瘸脚","update_time":"2019-09-03 16:10","chapters_total":672,"chapter_update":1,"evaluate_score":7.5,"evaluate_users":0,"reading_num":0,"praise_num":0,"attention_num":14216,"fensi_num":978,"publisher_id":159}}}
+用例测试结果:   t_011----&gt;pass
+检查点-&gt;："data":
+返回实际结果-&gt;：{"status":true,"data":{"info":{"star":5,"nid":7152,"bookname":"天价萌宝：总裁爹地超给力","cover":"https://wnzsapp.oss-cn-shanghai.aliyuncs.com/uploads/novel/161916911617.jpg?x-oss-process=image/resize,m_mfit,h_256,w_192/format,webp","tag":"现代言情","author":"谨羽","editorid":"桃乐文学","brief":"“偷了我的基因想不认帐？”他逮住她，要她交出6年前生的宝宝。她死活不愿交出儿子，他只好纡尊降贵的对她死缠烂打，更是扬言要求同居。“爸爸，妈妈和别的叔叔跑了。”某宝告密。“派人给我追，绑回来家法伺候。”某男大怒。她只是和同事一块儿去出差，哪里是和别的男人跑路。于是，以后的每天某宝看到妈妈总是扶着墙下楼，然后爸爸笑的意犹未尽。","status":2,"update_status":0,"words_number":"142万字","chapter_name":"第672章瘸脚","update_time":"2019-09-03 16:10","chapters_total":672,"chapter_update":1,"evaluate_score":7.5,"evaluate_users":0,"reading_num":0,"praise_num":0,"attention_num":14216,"fensi_num":978,"publisher_id":159}}}
+
+
+        </pre>
+    </div>
+    <!--css div popup end-->
+
+    </td>
+    <td></td>
+</tr>
+
+<tr id='pt1.11' class='hiddenRow'>
+    <td ><div class='testcase'>test_api_11</div></td>
+    <td colspan='5' align='center'>
+
+    <!--css div popup start-->
+    <span class='status passCase'>
+    <a class="popup_link" onfocus='this.blur();' href="javascript:showTestDetail('div_pt1.11')" >
+        通过</a></span>
+
+    <div id='div_pt1.11' class="popup_window">
+        <div style='text-align: right; color:red;cursor:pointer'>
+        <a onfocus='this.blur();' onclick="document.getElementById('div_pt1.11').style.display = 'none' " >
+           [x]</a>
+        </div>
+        <pre>
+        
+pt1.11: 请求头部：{'Content-Type': 'application/x-www-form-urlencoded'}
+*******正在执行用例：-----  t_012  ----**********
+请求方式：post, 请求url:http://apiprd.zhuishubao.com/appprogram/user-read/duration-append
+请求params：None
+post请求body类型为：data ,body内容为：{'version': '2', 'read_action': 'start', 'chapnum': '5', 'token': '', 'device_id': '860604044727590', 'nid': '7152'}
+页面返回信息：{"status":true,"data":{"info":{"read_mark":"9909251"}}}
+用例测试结果:   t_012----&gt;pass
+检查点-&gt;："data":
+返回实际结果-&gt;：{"status":true,"data":{"info":{"read_mark":"9909251"}}}
+
+
+        </pre>
+    </div>
+    <!--css div popup end-->
+
+    </td>
+    <td></td>
+</tr>
+
+<tr id='pt1.12' class='hiddenRow'>
+    <td ><div class='testcase'>test_api_12</div></td>
+    <td colspan='5' align='center'>
+
+    <!--css div popup start-->
+    <span class='status passCase'>
+    <a class="popup_link" onfocus='this.blur();' href="javascript:showTestDetail('div_pt1.12')" >
+        通过</a></span>
+
+    <div id='div_pt1.12' class="popup_window">
+        <div style='text-align: right; color:red;cursor:pointer'>
+        <a onfocus='this.blur();' onclick="document.getElementById('div_pt1.12').style.display = 'none' " >
+           [x]</a>
+        </div>
+        <pre>
+        
+pt1.12: 请求头部：{'Content-Type': 'application/x-www-form-urlencoded'}
+*******正在执行用例：-----  t_013  ----**********
+请求方式：post, 请求url:http://apiprd.zhuishubao.com/appprogram/fiction-chapter/book-reading-add
+请求params：None
+post请求body类型为：data ,body内容为：{'chapnum': '5', 'token': '', 'nid': '7152', 'version': '2', 'device_id': '860604044727590'}
+页面返回信息：{"status":true,"data":{"info":1}}
+用例测试结果:   t_013----&gt;pass
+检查点-&gt;："data":
+返回实际结果-&gt;：{"status":true,"data":{"info":1}}
+
+
+        </pre>
+    </div>
+    <!--css div popup end-->
+
+    </td>
+    <td></td>
+</tr>
+
+<tr id='total_row'>
+    <td>统计</td>
+    <td>12</td>
+    <td>11</td>
+    <td>1</td>
+    <td>0</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+</tr>
+</table>
+<script>
+    drawCircle(11, 1, 0)
+</script>
+
+<div id='ending'>&nbsp;</div>
+
+</body>
+</html>
