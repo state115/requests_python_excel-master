@@ -39,6 +39,7 @@ class MobileUserLocust(HttpLocust):
         }
         user_data_queue.put_nowait(data)
 
+
     min_wait = 1000
     max_wait = 3000
 
